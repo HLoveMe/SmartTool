@@ -3,6 +3,7 @@ import { Subject, Observable } from 'rxjs';
 import 'rxjs/add/operator/catch';
 
 import { Interceptor,HttpInterceptorHandler } from "./Interceptor";
+import { HLMChinaError ,ResponseResult} from "./HttpOptions";
 class NetWorkManagerInterceptor{
     /***
      *
@@ -36,14 +37,19 @@ class NetWorkManagerInterceptor{
     /**
         ops: HttpRequestOptions
         
-        func :(ops:RequestParamsInterceptor处理之后的 不是HttpRequestOptions ,subject)=>{}
+        func :(ops:RequestParamsInterceptor处理之后的 不是HttpRequestOptions 
      * */
     MapInterceptor(ops,func){
         return Observable.create((obs)=>{
-            this.interceptors[0]._intercept(ops,new HttpInterceptorHandler(this.interceptors,func)).catch(((error)=>{
+            this.interceptors[0]._intercept(ops,new HttpInterceptorHandler(this.interceptors,func)).catch((error)=>{
                 obs.error(error);
-                return Observable.of(0);
-            })).subscribe(()=>{})
+                return [error]
+            }).subscribe(()=>{/*这里是请求完成后的Response回调*/})
+        }).catch((error)=>{
+            if(error instanceof HLMChinaError){
+                return [Object.assign(new ResponseResult(),JSON.parse(error.message))]
+            }
+            return Observable.of(new Error("处理链 throw new Error("+error.message+")"))
         })
     }
 }

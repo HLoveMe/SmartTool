@@ -41,7 +41,7 @@ export class ErrorStatusAction extends ResponseResultAction{
 
     //ResponseResult
     action(ResResult){
-        let result = ResResult.result;
+        let result = ResponseResult.result;
         let code = result.status_code + "";
         let codeM = CodeMessages[code] || "请求失败";
         return new ResponseResult(false,new Error(codeM),result);

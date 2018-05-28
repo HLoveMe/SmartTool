@@ -30,9 +30,9 @@ export class Interceptor{
      *
      *  可以对请求参数进行拦截  对返回Response 进行扩展操作 不能修改
      *  
-     *  next 链 报错会被拦截 
-     *       抛出 ResponseResult 会被正确处理 中断原始请求
-     *       .next(obj) ResponseResult 会被正确处理 中断原始请求
+     *  链 报错会被拦截 
+     *      throw new HLMChinaError(ResponseResult)会被拦截
+     *             会作为请求正常结果进行处理
      * */
     intercept(option,next){
         /**
@@ -61,6 +61,7 @@ export class Interceptor{
 }
 
 export class ChainEndInterceptor extends Interceptor{
+    keyid = Symbol()
     constructor(props) {
         super(props);
         

@@ -6,14 +6,24 @@ import {  HttpRequestOptions ,HTTPMethod ,ResponseResultType,ResponseResult,Task
 
 import { InterceptorManager } from "./InterceptorManager";
 import { ResponseActionManager } from "./ResponseAction";
-
+/***
+ * 
+ *  Interceptor3  Interceptor2 Interceptor1
+ *  --------------------------------------->
+ *                                        |
+ *                                        |NetWork
+ *                                        |
+ *                                        |
+ *  <---------------------------------------
+ *       Acion3   Action2     Action1    
+ */
 export class NetWorkManager {
     /**
      * @param {*} url 
      * @param {*} method HTTPMethod
      * @param {*} body {}
      * @param {*} header {}
-     * @param {*} options {resType:ResponseResultType.Json,...}
+     * @param {*} options  HttpRequestOptions 对象的options参数{resType:ResponseResultType.Json,...}
      * return TaskResultSource 可取消
      * let taskS = NetWorkManager.Request(...)
      * taskS.Source.toPromise().then(....)
@@ -64,20 +74,13 @@ export class NetWorkManager {
                     obs.next(data);
                     obs.complete();
                 }else{
-                    obs.error(err);
+                    obs.error(data);
                 }
-            },(err)=>{
-                //处理请求拦截器链
-                if(err instanceof ResponseResult){
-                    obs.next(err);
-                    obs.complete();
-                }else{
-                    obs.error(err);
-                }
-            },()=>{
+            },(err)=>{/**错误已经被拦截处理*/},()=>{
                 obs.complete()
             })
         }).share();
+
         sturct.Source = Source;
         return sturct;
     }

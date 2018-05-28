@@ -24,11 +24,19 @@ export class HttpRequestOptions {
     url = "";
     method =  "GET";
     body = null;
+
     /***
-     *  resType:ResponseResultType.Json,
-     *  ....
-     *  headers:{}
-     *  mode:""
+     *  @options:
+     *      可以是fetch 第二个参数包含的对象
+     *      也可以是自定义的 在你自定义的请求链中处理
+     * 
+     *      
+     *      resType:ResponseResultType.Json,
+     *      headers:{}
+     *      mode:""
+     *      timeout:10000
+     *      ....其他
+     * 
      */
     options = null 
     constructor(url = "",method = HTTPMethod.POST,body = {},options={}) {
@@ -57,7 +65,7 @@ export class ResponseResult{
 
 
 import { Observable } from 'rxjs';
-
+//任务类
 export class TaskResultSource{
     _taskSource = null;
     Source = null;
@@ -74,5 +82,14 @@ export class TaskResultSource{
             this._taskSource.next(new ResponseResult(false,new Error("任务 取消"),null))
             this._taskSource.complete();
         }
+    }
+}
+
+/*** */
+
+export class HLMChinaError {
+    message = "{}"
+    constructor(result) {
+        this.message = JSON.stringify(result);
     }
 }

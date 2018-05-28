@@ -10,22 +10,22 @@ export class AllowOriginInterceptor extends Interceptor{
     
     ops = null;
     /*** 
+     * 默认增加的
      *  {
-     *      headers:{
-     *          ...
-     *      }
-     *      mode:""
-     *      ...
+            heaeders:{
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Request-Method': '*'
+            },
+            mode:"cros"
      *  }
      * 
     */
     constructor(props) {
         super(props);
-        this.ops = props;
+        this.ops = props || {};
         
     }
     intercept(option,next){
-        debugger
         option = {
             ...option,
             options:{

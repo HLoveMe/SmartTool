@@ -1,6 +1,8 @@
 
 import { ResponseResult } from "../HttpOptions";
 import { Interceptor } from "../Interceptor";
+import 'rxjs/add/operator/timeout';
+import { Observable } from "rxjs";
 /**
  *  设置请求超时时间
  *  options = {
@@ -15,7 +17,7 @@ export class TimeOutInterceptor extends Interceptor{
         if(option.options && option.options.timeout >= 1){}else{
             option.options.timeout = this.timeout;
         }
-        return  next(option).timeout(option.options.timeout ,new ResponseResult(false,new Error("Time Out " + `${option.options.timeout}ms`),null))
+        return  next(option).timeout(option.options.timeout)
     }
     
 }

@@ -21,8 +21,8 @@ export class DefaultHeadersInterceptor extends Interceptor{
             options:{
                 ...option.options,
                 headers:{
-                    ...this.defaultHeaders,
                     ...option.options.headers,
+                    ...this.defaultHeaders,
                 },
             } 
         }
