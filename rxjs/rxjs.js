@@ -3,6 +3,8 @@
     Observable.of(1)/(1,2,3,4,5)
     Observable.form("ABCD"|[])
 
+    delay
+        消息队列整体延迟多少毫秒
 
     debounceTime
         控制事件触发频率 (以消息为准)
