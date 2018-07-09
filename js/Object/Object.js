@@ -2,14 +2,25 @@
 Object
     prototype
         constructor  指向函数本身
-        __proto__    指向构造器函数的prototype
+        __proto__    指向 构造该对象的构造函数的原型
         hasOwnProperty 判读是自己的属性还是继承的属性
         isPrototypeOf   O.isPrototypeOf(X)  O是否在X的原型链上
         propertyIsEnumerable  判断其中有哪些可枚举的属性
         toString
         ....
-    
 
+    属性声明
+        let person = new Person()
+        person.name = "ZZH"
+        //defineProperties
+        Object.defineProperty(person,"name",{
+            configurable:false, // 设置为通过delete 不能删除
+            enumerable:false,  // 设置为通过for - in 循环不能返回该属性
+            writable:false, // 设置为不能修改属性值
+            value:"ZZH" //包含这个属性的数据值，能写入，能读取
+            get:func,
+            set:func
+        })
 
 对象的创建
  class Person{constructor(name){this.name = name}}
@@ -25,8 +36,14 @@ Object
 
 
 prototype 和 __proto__
-    __proto__ > 指向他的构造器函数的prototype
-    prototype > {__proto__,constructor}
+    __proto__ > 指向构造该对象的构造函数的原型 (父原型)
+        Person.__proto__ == Function的原型
+        person.__proto__ == Person函数的原型
+
+    prototype > { Person原型为Function原型
+        __proto__, 指向构造该对象的构造函数的原型 (Function原型对象  的  构造器函数的原型 ->Object原型)
+        constructor  （Person函数本身）
+    }
     
 > 任何对象都有__proto__ 属性 
 
@@ -49,8 +66,11 @@ prototype 和 __proto__
 
     function Person(){} Person函数对象
         __proto__  --> Function.prototype
-        prototype
+        prototype （Function原型）
             __proto__  -> Object.prototype
             constructor --> Person 函数
+
+
+
 
 

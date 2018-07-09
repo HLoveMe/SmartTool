@@ -5,9 +5,9 @@
         this.say=function(){}
     }
 
-    原型属性
+    原型属性s
         prototype
-        Person.prototype = Object.prototype
+        Person.prototype = Function.prototype
 
     实例属性
         say 为实例属性
@@ -22,7 +22,7 @@
             }
         }
         Person.prototype.say = func(){console.log("Person.protptype.say")}
-        调用顺序   实例方法  > 原型方法
+        调用顺序   实例方法|属性  > 原型方法
 
     原型
         Person.prototype

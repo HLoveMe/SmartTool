@@ -99,13 +99,14 @@
         class Sub extends Sup {}
         继承语句同时存在两条继承链：一条实现属性继承，一条实现方法继承。
             Sub.__proto__ === Sup;  //继承属性
-            Sub.prototype.__proto__ === Sup.prototype;  //继承方法
+            Sub.prototype.__proto__ === Sup.prototype;  //继承方法 编译的 _get(xxx,00)
+
         子类的__proto__指向父类   Sub.__proto__ = Sup
         子类的原型的__proto__     Sub.prototype.__proto__ = Sup.prototype   ()
 
         class ColorPoint extends Point {
             constructor(x, y, color) {
-              super(x, y); // 等同于parent.constructor(x, y)
+              super(x, y); // 等同于Point.prototype.constructor(x, y)
               /***
                *    super 当做函数 super()
                *    Point.prototypr.constructor.call(this,..)
@@ -151,8 +152,8 @@ class Person extends Animation{
         console.log("AAAA-a",this.name)
       }
     say(){
-    super.say()
-    this.eat()
+        super.say()
+        this.eat()
     }
 }
 
@@ -209,11 +210,20 @@ function _inherits(subClass, superClass) {
      */
     Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; 
 }
+// 继承链上得到对应方法 再进行调用
+/**
+ * object == SupClassFunc
+ * property 方法名
+ * receiver this
+*/
 var _get = function get(object, property, receiver) { 
     if (object === null) 
         object = Function.prototype; 
+    //父类  实例属性中查找
     var desc = Object.getOwnPropertyDescriptor(object, property); 
+    //实例属性中找不到  再原型链中查找
     if (desc === undefined) { 
+        
         var parent = Object.getPrototypeOf(object);
         if (parent === null) { 
             return undefined; 
@@ -221,6 +231,7 @@ var _get = function get(object, property, receiver) {
             return get(parent, property, receiver); 
         } 
     } else if ("value" in desc) { 
+        // 得到方法
         return desc.value;
     } else { 
         var getter = desc.get; 
@@ -247,9 +258,14 @@ var Animation = function () {
 }();
 
 var Person = function (_Animation) {
+    /***
+        Person.__proto__ === Animation; 
+        Person.prototype.__proto__ === Animation.prototype; 
+     */
     _inherits(Person, _Animation);
 
     function Person() {
+
         _classCallCheck(this, Person);
 
         /**
@@ -257,7 +273,7 @@ var Person = function (_Animation) {
          * var _this = SupClass.call(this,...)
          * 
          */
-        var call = (Person.__proto__ || Object.getPrototypeOf(Person1)).call(this)
+        var call = (Person.__proto__ || Object.getPrototypeOf(Person)).call(this)
         /**
          *  _this7 = call
          */
@@ -266,7 +282,7 @@ var Person = function (_Animation) {
         _this7.name = "AAA";
         return _this7;
     }
-
+    //附加在原型链上
     _createClass(Person, [{
         key: "eat",
         value: function eat() {
@@ -275,6 +291,7 @@ var Person = function (_Animation) {
       },{
         key: "say",
         value: function say() {
+            //Animation原型 或者Person原型
             //super
             var pro = Person.prototype.__proto__ || Object.getPrototypeOf(Person.prototype)
             //super.say()
