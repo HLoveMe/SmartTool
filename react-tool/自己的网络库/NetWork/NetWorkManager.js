@@ -1,7 +1,7 @@
 
 import {Observable} from 'rxjs';
 import 'rxjs/add/operator/catch';
-import "rxjs/operator/share"
+import "rxjs/operator/publish"
 import {  HttpRequestOptions ,HTTPMethod ,ResponseResultType,ResponseResult,TaskResultSource} from "./HttpOptions";
 
 import { InterceptorManager } from "./InterceptorManager";
@@ -79,7 +79,7 @@ export class NetWorkManager {
             },(err)=>{/**错误已经被拦截处理*/},()=>{
                 obs.complete()
             })
-        }).share();
+        }).publish().refCount();
 
         sturct.Source = Source;
         return sturct;

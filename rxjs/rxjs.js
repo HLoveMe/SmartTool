@@ -14,8 +14,13 @@
 
 
     Subject
+    BehaviorSubject 需要指定初始值 会保留最后发送一次数据 在下一个订阅后立即发出
+    ReplaySubject  会保留指定个数的 数据  订阅后发出
     PublisSubject
+    AsyncSubject  仅仅发送complete 之前的一个数据
 
+    subscribe(next,err,complete)
+    subscribe(new Subject())
 }
 {
     ConnectableObservable
