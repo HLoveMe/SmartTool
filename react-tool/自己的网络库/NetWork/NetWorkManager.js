@@ -24,14 +24,12 @@ export class NetWorkManager {
      * @param {*} body {}
      * @param {*} header {}
      * @param {*} options  HttpRequestOptions 对象的options参数{resType:ResponseResultType.Json,...}
-     * return TaskResultSource 可取消
      * let taskS = NetWorkManager.Request(...)
-     * taskS.Source.toPromise().then(....)
-     * taskS.cancelTask()//取消
+     * taskS.toPromise().then(....)
      */
     static Request(url,method,body,options){
         let sturct = new TaskResultSource();
-        let Source = Observable.create((obs)=>{
+        return Observable.create((obs)=>{
             sturct.taskSource = obs;
             let _options = new HttpRequestOptions(url,method,body,options);
             //interceptor信号
@@ -80,9 +78,7 @@ export class NetWorkManager {
                 obs.complete()
             })
         }).publish().refCount();
-
-        sturct.Source = Source;
-        return sturct;
+       
     }
     /**
      * NetWorkManager.GET(url,body).then((res)=>{}).catch(()=>{})
@@ -91,7 +87,7 @@ export class NetWorkManager {
      * @param {*} options 
      */
     static GET(url,body,options){
-        return NetWorkManager.Request(url,HTTPMethod.GET,body,options).Source.toPromise();
+        return NetWorkManager.Request(url,HTTPMethod.GET,body,options).toPromise();
     }
     /**
      *
@@ -101,7 +97,7 @@ export class NetWorkManager {
      * @param {*} options 
      */
     static POST(url,body,options){
-        return NetWorkManager.Request(url,HTTPMethod.POST,body,options).Source.toPromise();
+        return NetWorkManager.Request(url,HTTPMethod.POST,body,options).toPromise();
     }
     /**
      * ......

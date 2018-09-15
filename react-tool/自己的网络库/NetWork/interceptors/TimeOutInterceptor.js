@@ -19,5 +19,4 @@ export class TimeOutInterceptor extends Interceptor{
         }
         return  next(option).timeout(option.options.timeout)
     }
-    
 }

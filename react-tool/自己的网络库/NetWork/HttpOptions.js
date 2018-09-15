@@ -65,25 +65,6 @@ export class ResponseResult{
 
 
 import { Observable } from 'rxjs';
-//任务类
-export class TaskResultSource{
-    _taskSource = null;
-    Source = null;
-    cancel(){
-        if(this._taskSource == null){
-            this.Source = null ;
-            this.Source = Observable.create((obs)=>{
-                this._taskSource = obs;
-                obs.next(new ResponseResult(false,new Error("已经被取消"),null))
-                obs.complete()
-            })
-        }else if(this._taskSource.closed || this._taskSource.isStopped || this._taskSource.hasError){
-        }else{
-            this._taskSource.next(new ResponseResult(false,new Error("任务 取消"),null))
-            this._taskSource.complete();
-        }
-    }
-}
 
 /*** */
 
