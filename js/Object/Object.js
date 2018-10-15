@@ -25,6 +25,38 @@ Object
             get:func,
             set:func
         })
+        get | set 
+            1：属性配置中设置
+            2：a = {
+                get name(){
+
+                },
+                set name(){
+
+                },
+                //es6
+                get [window.name+"sasa"](){//使用变量作为名称
+
+                }
+            }
+
+    属性:
+        1：自身属性 和 原型属性是分开的 
+            obj.xxx (先查找自身属性 在 查找原型属性)
+            let obj = {name:"zzh"}
+            Object.defineProperty(obj.__proto__,"age",{get:()=>25}
+            obj.age // 25
+            obj.age = 16
+            obj.age //依然25 
+            
+            Object.defineProperty(obj,"age",{value:18,configurable:true,writable:true})
+            obj.age //18
+            obj.age= 100
+            obj.age //100
+            delete obj["age"]//删除自身属性
+            obj.age //25 向上查到到原型链
+
+
 
 对象的创建
  class Person{constructor(name){this.name = name}}
@@ -37,6 +69,31 @@ Object
     var p = {}
     p.__proto__ = Object.setPrototypeOf({},Person.prototype)
     Person.call(p,"AAA")
+
+
+
+对象的拷贝
+    1：浅拷贝 仅仅对属性进行拷贝
+        function copy(obj){
+            let target = {}
+            for(key in obj){
+                target[key] = obj[key]
+            }
+            return target
+        }
+        obj1 ={a:{name:1},name:"",fly:()=>{}}
+        obj2 = copy(obj1) //浅拷贝 a属性是个对象  依然会影响前后两个对象
+    2:深拷贝
+        function deepCopy(obj){
+            if(typeof obj != 'object'){
+                return obj;
+            }
+            var newobj = {};
+            for ( var attr in obj) {
+                newobj[attr] = deepCopy(obj[attr]);
+            }
+            return newobj;
+        }
 
 
 prototype 和 __proto__
