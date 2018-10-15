@@ -94,42 +94,24 @@ Object
             }
             return newobj;
         }
+1：obj Function Object
+    > 任何对象 或者（Function | Object）有 __proto__ 指向创建该对象的函数的原型链
+    > 只有函数(function ABCD{} || Function) 和 Object 才会有prototype
+
+        function ABCD(){}; let one = new ABCD();
+        one.__proto__ 指向 ABCD.prototype
+            ABCD.prototype.__proto__ == Object.prototype
+
+        Function.__proto__ == Function.prototype
+
+        Object.__proto__ == Function.prototype
+        Object.prototype(对象)
+            对象.__proto__ == null
+
+    > 函数(类)的继承是prototype完成
+      实例的继承是__proto__完成
 
 
-prototype 和 __proto__
-    __proto__ > 指向构造该对象的构造函数的原型 
-        Person.__proto__ == Function的原型
-        person.__proto__ == Person函数的原型 == Person.prototype
-
-    prototype > { Person原型为Function原型
-        __proto__, 指向构造该对象的构造函数的原型 (Function原型对象  的  构造器函数的原型 ->Object原型)
-        constructor  （Person函数本身）
-    }
-    
-> 任何对象都有__proto__ 属性 
-
-> 非函数对象只有一个__proto__属性  【非函数对象.png】
-    function Person(){}
-    var per = new Person()
-        per.__proto__ ==  Person.prototype
-            Person.prototype
-                __proto__ --> Object 的原型
-                constructor --> function Person 函数本身
-
-        per.prototype == undefined
-
-> 函数对象有 __proto__ 和 prototype   【函数对象.png】
-    function Function(){}
-        __proto__ --> 自己 Function.prototype
-        prototype
-            __proto__ --> 自己 Function.prototype
-            constructor-->Function
-
-    function Person(){} Person函数对象
-        __proto__  --> Function.prototype
-        prototype （Function原型）
-            __proto__  -> Object.prototype
-            constructor --> Person 函数
 
 
 
