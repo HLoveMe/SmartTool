@@ -108,8 +108,12 @@ Object
         Object.prototype(对象)
             对象.__proto__ == null
 
-    > 函数(类)的继承是prototype完成
-      实例的继承是__proto__完成
+    > 函数(类) 和 实例 都是 __proto__ 完成继承
+      person = {}
+      person.name 
+        1:在person本身上查找 null
+        2:在原型链上查找 persopn.__proto__( == Persion.prototype )上查找
+        3:最后会一直查找到 Object.prototype 上
 
 
 
