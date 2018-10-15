@@ -7,9 +7,13 @@ Object
         isPrototypeOf   O.isPrototypeOf(X)  O是否在X的原型链上
         propertyIsEnumerable  判断其中有哪些可枚举的属性
         toString
+
+        for / in 语句块   可枚举的（自身和继承）的属性列表
+        Object.keys(obj) 返回可枚举属性列表
+        Object.getOwnPropertyNames(obj)  得到自身属性列表（可枚举 和 不可枚举）
         ....
 
-    属性声明
+    属性声明（属性描述符）
         let person = new Person()
         person.name = "ZZH"
         //defineProperties
@@ -36,9 +40,9 @@ Object
 
 
 prototype 和 __proto__
-    __proto__ > 指向构造该对象的构造函数的原型 (父原型)
+    __proto__ > 指向构造该对象的构造函数的原型 
         Person.__proto__ == Function的原型
-        person.__proto__ == Person函数的原型
+        person.__proto__ == Person函数的原型 == Person.prototype
 
     prototype > { Person原型为Function原型
         __proto__, 指向构造该对象的构造函数的原型 (Function原型对象  的  构造器函数的原型 ->Object原型)
