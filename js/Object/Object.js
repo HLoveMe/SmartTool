@@ -106,8 +106,8 @@ obj Function Object (关系)
         Function.__proto__ 和 Function.prototype 两者是同一对象 （Function.prototype）
 
         Object.__proto__ == Function.prototype
-        Object.prototype(对象)
-            对象.__proto__ == null
+        Object.prototype
+            Object.prototype.__proto__ == null
 
     > 函数(类) 和 实例 都是 __proto__ 完成继承
       person = {}
@@ -115,6 +115,28 @@ obj Function Object (关系)
         1:在person本身上查找 null
         2:在原型链上查找 persopn.__proto__( == Persion.prototype )上查找
         3:最后会一直查找到 Object.prototype 上
+
+    dome:
+      Object.toString
+        1:自身没有
+        2：Object.__proto__(Function.prototype) 上有该函数
+    
+      Object.prototype.toString
+        Object.prototype对象上有该函数
+        
+        ===> Object.toString !==  Object.prototype.toString
+
+      function ABCD(){}
+         ABCD.prototype.toString == Object.prototype.toString
+
+    dome2 :
+        function Persopn(){}
+        per = new Persopn()
+        per.toString
+            1：per实例上无该函数
+            2：per.__proto__(Persopn.prototype) 上查找
+            3：Person.prototype.__proto__ (Object.prototype)上查找
+            4：per.toString == Object.prototype.toString
 
 
 
