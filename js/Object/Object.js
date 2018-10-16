@@ -94,15 +94,16 @@ Object
             }
             return newobj;
         }
-1：obj Function Object
+
+obj Function Object (关系)
     > 任何对象 或者（Function | Object）有 __proto__ 指向创建该对象的函数的原型链
-    > 只有函数(function ABCD{} || Function) 和 Object 才会有prototype
+    > 只有函数(function ABCD{} || Function) 和 Object 才会有prototype属性
 
         function ABCD(){}; let one = new ABCD();
         one.__proto__ 指向 ABCD.prototype
             ABCD.prototype.__proto__ == Object.prototype
 
-        Function.__proto__ == Function.prototype
+        Function.__proto__ 和 Function.prototype 两者是同一对象 （Function.prototype）
 
         Object.__proto__ == Function.prototype
         Object.prototype(对象)

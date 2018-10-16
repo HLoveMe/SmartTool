@@ -13,10 +13,10 @@
         refCount 转为普通的Observable对象
 
 
-    Subject
+    Subject         尽量不直接使用这个类（Observale 或者 下面的代替）
     BehaviorSubject 需要指定初始值 会保留最后发送一次数据 在下一个订阅后立即发出
     ReplaySubject  会保留指定个数的 数据  订阅后发出
-    PublisSubject
+    PublisSubject  仅仅把订阅之(后)的数据发送 订阅之(前)的数据不会发送
     AsyncSubject  仅仅发送complete 之前的一个数据
 
     subscribe(next,err,complete)
