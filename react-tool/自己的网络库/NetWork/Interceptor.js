@@ -61,7 +61,7 @@ export class Interceptor{
 }
 
 export class ChainEndInterceptor extends Interceptor{
-    keyid = Symbol()
+    keyid = "ChainEndInterceptor";// Symbol()
     constructor(props) {
         super(props);
         

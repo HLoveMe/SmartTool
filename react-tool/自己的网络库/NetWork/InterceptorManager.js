@@ -80,5 +80,5 @@ export const  InterceptorManager = new NetWorkManagerInterceptor([
  *  NetWork / interceptor / LogInterceptor.js 简单的日志输出 
  *  NetWork / interceptor / AllowOriginInterceptor.js 处理fetch 跨域问题 
  *                      ../ DefaultHeadersInterceptor   方便设置统一的请求头信息
- * 
+ * //SimulateRequestInterceptor
  */

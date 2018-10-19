@@ -2,7 +2,7 @@
 import {Observable} from 'rxjs';
 import 'rxjs/add/operator/catch';
 import "rxjs/operator/publish"
-import {  HttpRequestOptions ,HTTPMethod ,ResponseResultType,ResponseResult,TaskResultSource} from "./HttpOptions";
+import {  HttpRequestOptions ,HTTPMethod ,ResponseResultType,ResponseResult} from "./HttpOptions";
 
 import { InterceptorManager } from "./InterceptorManager";
 import { ResponseActionManager } from "./ResponseAction";
@@ -28,9 +28,7 @@ export class NetWorkManager {
      * taskS.toPromise().then(....)
      */
     static Request(url,method,body,options){
-        let sturct = new TaskResultSource();
         return Observable.create((obs)=>{
-            sturct.taskSource = obs;
             let _options = new HttpRequestOptions(url,method,body,options);
             //interceptor信号
             let interun = InterceptorManager.MapInterceptor(_options,(ops,sub)=>{
