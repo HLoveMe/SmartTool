@@ -15,16 +15,27 @@ Object
 
     属性声明（属性描述符）
         let person = new Person()
-        person.name = "ZZH"
-        //defineProperties
+        person.name = "ZZH" 
+            {
+                configurable:true,
+                enumerable:true,
+                writable:true,
+                value:"ZZH"    
+            }
         Object.defineProperty(person,"name",{
-            configurable:false, // 设置为通过delete 不能删除
-            enumerable:false,  // 设置为通过for - in 循环不能返回该属性
-            writable:false, // 设置为不能修改属性值
-            value:"ZZH" //包含这个属性的数据值，能写入，能读取
-            get:func,
-            set:func
+            configurable, // 设置为通过delete 不能删除
+                如果为false 不能对enumerable | writable再次配置
+                如果为true  可再次定义enumerable | writable
+            enumerable,  // 设置为通过for - in 循环不能返回该属性
+            writable, // 设置为不能修改属性值
+            value:"AA" //包含这个属性的数据值，能写入，能读取
+        } || {
+            configurable:false,
+            enumerable:false,
+            writable:false,
+            value:undefined
         })
+
         get | set 
             1：属性配置中设置
             2：a = {
