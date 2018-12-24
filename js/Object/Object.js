@@ -29,6 +29,9 @@ Object
             enumerable,  // 设置为通过for - in 循环不能返回该属性
             writable, // 设置为不能修改属性值
             value:"AA" //包含这个属性的数据值，能写入，能读取
+                get:function
+                set:function
+            //当使用了getter或setter方法，不允许使用writable和value这两个属性
         } || {
             configurable:false,
             enumerable:false,

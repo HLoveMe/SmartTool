@@ -35,15 +35,32 @@
 }
 
 创建
+    new Observable((obs)=>{
+        obs.next()
+        obs.error()
+        return xxObs.subscribe(()=>{
+
+        })
+        return ()=>{
+
+        }
+        return void
+
+        return AnonymousSubscription | Function | void
+    })
     Observable.of(1)/(1,2,3,4,5)
     Observable.interval(1000)发送一个连续的 保存 1000ms间隔的信号
     Observable.timer(初始时间点,时间间隔) 首先间隔多次时间 再发送连续的时间间隔信号
     create 自定义初始逻辑
-        Observable.create()
+        Observable.create(function(obs){
+
+
+            return AnonymousSubscription | Function | void
+        })
     fromPromise(PromiseLike)
     from([]|迭代器对象|PromiseLike|Subscribable)
-    range
-    defer
+    range 指定信号的一个范围 range(0,10)
+    defer 延迟Observable的创建 直到被订阅
         欧巴桑 = Observable.defer(function () {
             if (Math.random() > 0.5) {
                 return Rx.Observable.fromEvent(document, 'click');
@@ -76,14 +93,48 @@
             );
             eventEmitter.emit("EVENNAME",..)
 
-操作符
+订阅
+    let obser = Observable.create()
+    let sub = obser.subscribe(next,err,complate)
+    sub.unsubscribe()
+    
+    subscribe(
+        PartialObserver(Subject 及其子类)
+        ()=>{},()=>{},()=>{}
+    )
 
+操作符 原型链上
+    do | tap | let
+        不会改变Obser的任何东西 只是增加一步回调
+    toPromise   被 Observable.toPromise 替代
+        只能接受完成信息Promise
     delay
         消息队列整体延迟多少毫秒
-
+    scan
+       应用一个函数 在每次的信号上   （累加操作）     
     take(num)
         是信号只能发送num次
-        
+    filter
+        过滤信号 true 的可以向下执行
+    max | min
+        数字 在完成时  发出最大的一个值
+    Map
+        改变信号
+    retry
+            
+    pipe    
+        一个管道  可以定义你自己的信号处理过程 （自定义操作符）
+        pipeable 好处是 自定义的操作符 不需要再每个Observable原型上绑定 
+                 直接通过现有pipe就可以达到使用所有操作符的目的
+
+        Observale.timer(1000).pipe(
+            map(index=>index+2),管道1
+            filter(index=>index%2==1),管道2
+            take(3), 管道3
+            CustomPipe()管道4
+        )
+
+
     debounceTime
         控制事件触发频率 (以消息为准)
 
@@ -135,3 +186,24 @@
             console.log("_onTopClick2",res)
         })
 
+自定义操作符  纯函数
+    操作符:Observale<T> => Observable<R>
+    function CustomPipe(num){
+        return (source)=>{
+            return Observable.create((obs)=>{
+
+                 return source.take(num).subscribe((s)=>obs.next(s),(err)=>{
+                    obs.error(err)
+                },()=>{
+                    obs.complate()
+                })
+            })
+        }
+    }
+    Observale.create().pipe(
+        CustomPipe(100),
+        map(xxx)
+    )
+
+自定义操作符  原型链上定义
+    https://cn.rx.js.org/manual/usage.html#h13
