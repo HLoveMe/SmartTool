@@ -1,3 +1,4 @@
+import { join } from "path";
 
     Subject == （Observer和Observable）
     是被观察者(信号) 也是观察者(订阅者)
@@ -111,7 +112,9 @@
     delay
         消息队列整体延迟多少毫秒
     scan
-       应用一个函数 在每次的信号上   （累加操作）     
+       应用一个函数 在每次的信号上   （累加操作）
+       [1,2,3,4].scan((x,y)=>x+y,initv) ===>1 3 6 10
+        
     take(num)
         是信号只能发送num次
     filter
@@ -185,6 +188,31 @@
         b.subscribe((res)=>{
             console.log("_onTopClick2",res)
         })
+    
+    信号组合
+        zip
+            多个消息源  
+            把 对应索引 下的多个消息源 组合之后在发出 
+                
+            必须对应所有索引都有消息 在发出
+
+        combineLatest
+            多个消息源  
+            每次的消息源 都会组合最近的消息 发出
+
+        merge
+            组合多个信号源 然后在一次发出
+                1    2  3
+                   a      b
+                  merge
+                1 a 2 3 b
+                
+        withLatestFrom
+            只有当主要这个的 Observabale 发出值 时使⽤用每个源的最后⼀一个值
+            
+            (主要obs).withLatestFrom([a,b,c,d],func)
+
+
 
 自定义操作符  纯函数
     操作符:Observale<T> => Observable<R>
