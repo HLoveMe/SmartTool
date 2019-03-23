@@ -1,0 +1,51 @@
+
+LinearLayout 线性布局
+    用于块分割
+    android:orientation  指明子元素摆放规律  horizontal 水平  vertical 垂直
+    gravity 控制子组件的对齐方式
+    layout_gravity 控制自己在父组件的对齐方式 
+    layout_width
+    layout_height
+    layout_weight 权重 比例分割
+    divider 分割线图片
+    showDividers "none middle begining end" 分割线位置
+    dividerPadding 分割线padding
+
+
+RelativeLayout(相对布局)
+    用于进行组件为位置布局
+    gravity 设置子组件的对齐方式
+    ignoreGravity true 将不受gravity的影响
+
+    相对父容器定位
+        layout_alignParentLeft 左对齐
+        layout_alignParentRight
+        layout_alignParentTop
+        layout_alignParentBottom
+
+        layout_centerHorizontal 水平居中
+        layout_centerVertical 上下居中
+        layout_centerInParent 上下左右居中居中
+    相对兄弟组件
+
+        layout_toRightOf  我的左 你的右对齐
+        layout_toLeftOf   我的右 你的左对齐
+        layout_above     我的下 你的上对齐
+        layout_below     我的上 你的下对齐
+
+
+        layout_alignTop    顶部对齐
+        layout_alignBottom 底部对齐
+        layout_alignLeft   左边对齐
+        layout_alignRight  右边对齐
+
+    偏移 margin 于父容器
+        layout_margin 下左下右
+        layout_marginLeft
+        layout_marginBotton
+        layout_marginTop
+        layout_marginRight
+
+    padding 填充
+        padding
+        paddingLeft|Right|Top|Bottom|End|Start|Horizontal|Vertical

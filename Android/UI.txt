@@ -1,0 +1,70 @@
+Drawable  资源对象
+
+状态 check focused pressed selected enabled
+    android:state_pressed true指当用户点击或者触摸该控件的状态。默认为false；一般用于设置按钮颜色/图片的设置。
+    android:state_focused ture指当前控件获得焦点时的状态。默认为false；一般用于EdiText。
+    android:state_enabled 布尔值。true表示当前控件出于可用的状态。比如可以被点击
+    android:state_activated   布尔值。true表示当前控件被激活的状态。 
+XML含义
+    values 定义的常量
+    layout 布局文件
+    drawable 资源 样式 图片 状态图片
+
+View 视图父类
+
+
+
+TextView   文本
+    text
+    textColor
+    textStyle
+    textSize   sp
+    textAlignment 对齐方式
+    bufferType 
+        指定 getText 获取的文本类型 
+        editable(StringBuilder  SpannableStringBuilder)  可变文本
+        spannable(SpannableString)              不可变文本
+    singleLine  true 只有一行 不换行
+    maxLines  2
+    height maxHeight minHeight width maxWidth minWidth
+
+    ellipsize = "end"　　  省略号在结尾
+                "start" 　　省略号在开头
+                "middle"     省略号在中间
+                "marquee"  跑马灯
+    setEllipsize(TextUtils.TruncateAt.valueOf("END"));
+
+    在TextView绘制图片
+        android:drawableTop="@drawable/show1"  
+        android:drawableLeft="@drawable/show1"  
+        android:drawableRight="@drawable/show1"  
+        android:drawableBottom="@drawable/show1"  
+
+    setText(CharSequence text, [BufferType type])
+        Spanned (Html)
+        String  文本 StringBuilder 可增加的文本
+        SpannableString 富文本  SpannableStringBuilder  可增加的富文本
+            BackgroundColorSpan 背景色
+            ClickableSpan 文本可点击，有点击事件  必须设置才会生效setMovementMethod(LinkMovementMethod.getInstance());
+            ForegroundColorSpan 文本颜色（前景色）
+            MaskFilterSpan 修饰效果，如模糊(BlurMaskFilter)、浮雕(EmbossMaskFilter)
+            MetricAffectingSpan 父类，一般不用
+            RasterizerSpan 光栅效果
+            StrikethroughSpan 删除线（中划线）
+            SuggestionSpan 相当于占位符
+            UnderlineSpan 下划线
+            AbsoluteSizeSpan 绝对大小（文本字体）
+            DynamicDrawableSpan 设置图片，基于文本基线或底部对齐。
+            ImageSpan 图片
+            RelativeSizeSpan 相对大小（文本字体）
+            ReplacementSpan 父类，一般不用
+            ScaleXSpan 基于x轴缩放
+            StyleSpan 字体样式：粗体、斜体等
+            SubscriptSpan 下标（数学公式会用到）
+            SuperscriptSpan 上标（数学公式会用到）
+            TextAppearanceSpan 文本外貌（包括字体、大小、样式和颜色）
+            TypefaceSpan 文本字体
+            URLSpan 文本超链接
+        
+
+Button extends TextView
