@@ -1,10 +1,19 @@
 Drawable  资源对象
 
-状态 check focused pressed selected enabled
-    android:state_pressed true指当用户点击或者触摸该控件的状态。默认为false；一般用于设置按钮颜色/图片的设置。
-    android:state_focused ture指当前控件获得焦点时的状态。默认为false；一般用于EdiText。
-    android:state_enabled 布尔值。true表示当前控件出于可用的状态。比如可以被点击
-    android:state_activated   布尔值。true表示当前控件被激活的状态。 
+状态 
+    state_focused:是否获得焦点
+    state_window_focused:是否获得窗口焦点
+    state_enabled:控件是否可用
+    state_checkable:控件可否被勾选,eg:checkbox
+    state_checked:控件是否被勾选
+    state_selected:控件是否被选择,针对有滚轮的情况
+    state_pressed:控件是否被按下
+    state_active:控件是否处于活动状态,eg:slidingTab
+    state_single:控件包含多个子控件时,确定是否只显示一个子控件
+    state_first:控件包含多个子控件时,确定第一个子控件是否处于显示状态
+    state_middle:控件包含多个子控件时,确定中间一个子控件是否处于显示状态
+    state_last:控件包含多个子控件时,确定最后一个子控件是否处于显示状态
+
 XML含义
     values 定义的常量
     layout 布局文件
@@ -68,3 +77,98 @@ TextView   文本
         
 
 Button extends TextView
+
+ImageView
+    background 背景会被拉伸 宽度来进行拉伸  受scaleType影响
+    src 不会拉伸 直接填充内容          不受scaleType影响
+    foreground 部分有效 指的是前景 会被拉伸 宽度来进行拉伸  受scaleType影响 （(1) Android M版本（6.0）及以上 ；(2) FrameLayout本身及其子类。）
+
+        foreground > src > background 
+
+    adjustViewBounds属性，用于设置缩放时是否保持原图长宽比。 单独设置不起作用，需要配合maxWidth和maxHeight属性一起使用
+        图片大小确定 保持图片宽高比 
+            1）设置layout_width和layout_height为wrap_content；
+            2）设置adjustViewBounds为true；
+            3）设置maxWidth、MaxHeight值。
+
+    ScaleType
+        android:scaleType || imageView.setScaleType(ImageView.ScaleType.CENTER)
+
+        MATRIX / matrix 不缩放图片 左上角开始 超过的部分裁剪
+        CENTER / center 保持原图的大小，显示在ImageView的中心  超过的部分裁剪
+        CENTER_CROP / centerCrop  保持图片比例 拉伸；必须暂满视图 超过部分裁剪
+        CENTER_INSIDE / centerInside 保持图片比例 拉伸 知道有一边占满视图
+        FIT_XY / fitXY  不保持比例 拉伸 占满屏幕
+        FIT_START / fitStart 比例拉伸知道宽|高 一边相等 然后放置在左上角
+        FIT_CENTER / fitCenter 比例拉伸知道宽|高 一边相等 然后放置在中间
+        FIT_END / fitEnd  比例拉伸知道宽|高 一边相等 然后放置在右上角
+
+
+ImageButton exten ImageView
+    只能展示图片 不能展示文字
+    图片是比例进行拉伸  
+        android:background :这是一个可拉伸使用来做背景 
+        android:src : 内容
+        android:onClick: 在本视图的上下文视图被点击时调用的方法的名称 
+        android:visibility: 控制视图的初始可视性 
+        android:cropToPadding : 如果为true，图像将被裁剪以适合其填充之内    
+        android:adjustViewBounds :设置为true,如果想调整ImageView其边界，以保持其绘制的高宽比 
+        android:baseline: 这是偏移此视图内部基线 
+        android:baselineAlignBottom: 如果为true，则图像视图会基于其底部边缘基线对齐 
+
+复选框
+    单选
+        RadioGroup | RadioButton
+    多选
+        checkbox
+    改变选中图标 
+        radio.xml
+        <selector xmlns:android="http://schemas.android.com/apk/res/android">
+            <item
+                android:state_enabled="true"
+                android:state_checked="true"
+                android:drawable="@mipmap/ic_checkbox_checked"/>
+            <item
+                android:state_enabled="true"
+                android:state_checked="false"
+                android:drawable="@mipmap/ic_checkbox_normal" />
+        </selector>
+
+        <RadioButton android:button="@drawable/radio"></RadioButton>
+
+    改变文字与图片的相对位置
+        <RadioButton 
+            android:button="null"
+            android:drawableTop="@drawable/radio"
+        >
+        </RadioButton>
+    修改文字与图片的相对位置
+        xml 使用padding
+
+开关
+    Switch
+        android:showText：设置on/off的时候是否显示文字,boolean
+        android:splitTrack：是否设置一个间隙，让滑块与底部图片分隔,boolean
+        android:switchMinWidth：设置开关的最小宽度
+        android:switchPadding：设置滑块内文字的间隔
+        android:switchTextAppearance：设置开关的文字外观，暂时没发现有什么用...
+        android:textOff：按钮没有被选中时显示的文字
+        android:textOn：按钮被选中时显示的文字
+        android:textStyle：文字风格，粗体，斜体写划线那些
+        android:track：底部的图片
+        android:thumb：滑块的图片
+        android:typeface：设置字体
+
+进度条
+    ProgressBar精度条
+        android:max：进度条的最大值
+        android:progress：进度条已完成进度值
+        android:progressDrawable：设置轨道对应的Drawable对象
+        android:indeterminate：如果设置成true，则进度条不精确显示进度
+        android:indeterminateDrawable：设置不显示进度的进度条的Drawable对象
+        android:indeterminateDuration：设置不精确显示进度的持续时间
+        android:secondaryProgress：二级进度条，类似于视频播放的一条是当前播放进度，一条是缓冲进度，前者通过progress属性进行设置！
+    SeekBar extends ProgressBar  拖动条
+        android:thumb = "@mipmap/sb_icon" //滑块的drawable
+
+    RatingBar extends ProgressBar 
