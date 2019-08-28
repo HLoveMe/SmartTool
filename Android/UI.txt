@@ -19,6 +19,48 @@ XML含义
     layout 布局文件
     drawable 资源 样式 图片 状态图片
 
+LayoutInflater
+    》对于一个没有被载入或者想要动态载入的界面（XML）, 都需要使用inflate来载入. 
+    》对于一个已经载入的Activity,就可以使用实现了这个Activiyt的的findViewById方法来获得其中的界面元素. 
+        setContentView 已经加载的界面
+
+    获取方式
+
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = LayoutInflater.from(context);
+
+    获取视图
+        public View inflate(@LayoutRes int resource, @Nullable ViewGroup root) {
+            ...省略实现代码...
+        }
+        public View inflate(@LayoutRes int resource, @Nullable ViewGroup root, boolean attachToRoot) {    
+            ...省略实现代码...
+        }
+
+        inflater.inflate(id,null) == inflater。inflate(id,null,true|false)
+        得到视图 root == null 最外层的布局属性全部失效 在进行显示之后会根据父级 重新布局
+            1:
+                <RelativeLayout 
+                    android:xx 失效
+                    android:oo 失效
+                    >
+                    <TextView></TextView>
+                </RelativeLayout>
+            2:
+                <TextView
+                    android:xx 失效
+                    android:oo 失效
+                ></TextView>
+
+        inflater.inflate(id,root,attachToRoot) 
+            root 有值 最外层的所有layout属性都有效
+            attachToRoot 默认为true 并自动 root.addView(view, params)
+                inflater.inflate(id,root) 
+                == inflater.inflate(id,root,true)
+                == root.addView(inflater.inflate(id,root),false)
+
+        View.inflate() 内部依然调用上面的方法。
+
 View 视图父类
 
 
@@ -172,3 +214,13 @@ ImageButton exten ImageView
         android:thumb = "@mipmap/sb_icon" //滑块的drawable
 
     RatingBar extends ProgressBar 
+
+ListVew
+    BaseAdapter
+    焦点问题 
+        item 中存在 Check Button 那么就会默认获取焦点 导致ListView 无法获取焦点 和 点击事件
+            为抢占焦点组件设置:android:focusable="false"
+            item的根节点设置 android:descendantFocusability="blocksDescendants"
+                beforeDescendants：viewgroup会优先其子类控件而获取到焦点
+                afterDescendants：viewgroup只有当其子类控件不需要获取焦点时才获取焦点
+                blocksDescendants：viewgroup会覆盖子类控件而直接获得焦点
