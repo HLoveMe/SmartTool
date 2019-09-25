@@ -69,7 +69,9 @@ import { join } from "path";
                 return Rx.Observable.interval(1000);
             }
         });
-    
+    just 创建一个源的信号
+    repeat 创建一个源 重复n次  repeat(value,n)
+    timer(init,time) 创建连续的时间间隔信号
     bindCallback(func,selector)
         func 包装函数
         selector ()=>{}可选获取回调函数的参数，返回值作为信号值      
@@ -93,6 +95,15 @@ import { join } from "path";
                 selector ()=>{}可选获取回调函数的参数，返回值作为信号值      
             );
             eventEmitter.emit("EVENNAME",..)
+    
+    timeInterval Obs<T>==>Obs<TimeInterval<T>
+        记录信号的索引和间隔
+    timeout 规定信号执行时间 时间段后 会结束信号
+        .delay(5000)
+        .timeout(200, 'Timeout has occurred.');
+
+        .delay(5000)
+        .timeout(200, Promise.resolve(42));
 
 订阅
     let obser = Observable.create()
@@ -117,14 +128,22 @@ import { join } from "path";
         
     take(num)
         是信号只能发送num次
+    
+    takeLas(num) 仅仅下发最后num次
+
     filter
         过滤信号 true 的可以向下执行
     max | min
         数字 在完成时  发出最大的一个值
     Map
-        改变信号
+        改变每个信号
+    skip(num)
+        忽略前几个信号
+    skipLast
     retry
-            
+    startWith 在信号量 最前方加入一个信号
+        Observabale.from([1,2,3,4,5]).startWith(0)
+        0,1,2,3,4,5,  
     pipe    
         一个管道  可以定义你自己的信号处理过程 （自定义操作符）
         pipeable 好处是 自定义的操作符 不需要再每个Observable原型上绑定 
