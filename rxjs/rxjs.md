@@ -297,6 +297,7 @@
 			多个消息源  
 			把 对应索引 下的多个消息源 组合之后在发出 
 			必须对应所有索引都有消息 在发出
+			Ob.zip(sourceA,sourceB,(A,B)=>T).sub(T)
 			```
 		* combineLatest
 
@@ -304,6 +305,13 @@
 			Observable. combineLatest
 			多个消息源  
 			每次的消息源 都会组合最近的消息 发出
+			1  2   3  
+			
+			a    c
+			
+			1a 2a 2c 3c
+			
+			Ob.combineLatest(sourceA,sourceB,(A,B)=>T).sub(T)
 			```
 		* merge
 			
