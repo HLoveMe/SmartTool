@@ -26,6 +26,7 @@
 		AsyncSubject  仅仅发送complete 之前的一个数据
 	```
  [Document](https://cn.rx.js.org/manual/usage.html#h13)
+ [Document2](https://cn.rx.js.org/class/es6/Observable.js~Observable.html)
 * 创建
 	
 	* new
@@ -157,7 +158,7 @@
         只能接受完成信息Promise
    * delay
         消息队列整体延迟多少毫秒
-   * scan
+   * scan 类似数组reduce
        应用一个函数 在每次的信号上   （累加操作）
        [1,2,3,4].scan((x,y)=>x+y,initv) ===>1 3 6 10
         
@@ -183,7 +184,7 @@
        ==
        .pluck("value")
        ```
-	* flatMap 适用于inner Observable   
+	* flatMap 适用于inner Observable  高阶
 		
 		```
 		适用多层级Oberver  打平 信号
@@ -426,14 +427,30 @@
 			        map(xxx)
 			    )
 			```
+* 高阶Observer  信号量为Observer
+	
+	```
+	flatMap(mergeMap)
+	combineAll
+	concatAll
+	mergeAll
+	switch
+	switchMap
+	```
+
 * 错误处理
 	
 	* catch
 
-	* retry(num) 当接受到error后 再次创建新的。会先发出之前的num个信号
+		```
+		.catch((error)=>throw Error()).sub({error:()=>{}})//处理异常
+		caught.map().catch((error,caught)=>caught).sub() //再次订阅
+		caught.map().catch(()=>Observer.of()).//订阅新的源
+		```
+
+	* retry(num) 当接受到error后 再次订阅源
         Object.from([1,2,onError,3,4,5]).retry(2).subscribe()
-        1，2 onError
-            1，2，“1，2，3，4，5”
+    * retryWhen
 * 订阅
 	
 	```
@@ -517,7 +534,7 @@ export { concat } from './operators/concat';
 export { concatAll } from './operators/concatAll';
 export { concatMap } from './operators/concatMap';
 export { concatMapTo } from './operators/concatMapTo';
-export { count } from './operators/count';
+export { count } from './operators/count'; 记录信号数量 
 export { debounce } from './operators/debounce';
 export { debounceTime } from './operators/debounceTime';
 export { defaultIfEmpty } from './operators/defaultIfEmpty';
