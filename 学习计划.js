@@ -1,22 +1,18 @@
+/*
+ * @ one cat biubiubiu ~~~
+ * @Date: 2019-11-19 11:01:45
+ * @LastEditTime: 2019-12-02 16:08:05
+ * @Author: 朱子豪
+ * @Description: 
+ */
 
 ```
-学习Django
-    5月28 学习中
+1:React-Native 0.6.0 以后版本的文档[完成]
 
-购买腾讯域名
-    5月28   计划中
-    6.6    购买还需要注册
+2:Ionic React 了解一下 [完成]
 
-NodeJs搭建简单服务
-    》实现小文件上传
-    》文字复制共享
-    5月28   计划中
-    5月31   编写完成 119.29.16.140:3001
+3:Android 学习 
 
-    7.17 目前使用ts重写
+4:Vue了解
 
-React
-    react-native-rename 直接修改项目名称
-s
-    7.17使用ts编写rn项目
 ```
