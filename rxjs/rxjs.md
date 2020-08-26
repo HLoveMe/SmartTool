@@ -313,11 +313,54 @@
         b.subscribe()
         b.subscribe()
 		```
+	* buffer (缓存信号 直到边界信号出现) 
+		
+		```
+			let source =Observel.interval(1000) //信号源
+			var clicks = Rx.Observable.fromEvent(document, 'click');//边界信号
+			source.buffer(clicks).sub(a:[]=>{})
+			
+			收集每次点击事件之前的信号并组合发送
+			-1--2-3-|---4-5|-6-7-8-9-10-|-
+			[1,2,3] [4,5] [6,,7,8,9,10]
+		```
+	* bufferWhen ~=buffer
+	
+	* bufferCount(bufferSize,startBufferEvery?) 基于buffer
+
+		```
+		bufferCount(2) 有两个信号后将其组合发送
+		startBufferEvery：number 分配一组之后 向后偏移多少
+		
+		1 2 3  4 5 6 7
+		bufferCount(2) [1,2][3,4][5,6][7]
+		bufferCount(2,1) ==>[1,2] [2,3],[3,4],[4,5] [5,6][ 6,7]
+		bufferCount(2,3) ==>[1,2],[4,5] [7]
+		```
+	* bufferTime(bufferTimeSpan: number, bufferCreationInterval: number, maxBufferSize: number) 缓存一定时间内的信号 然后组合发出
+		
+		```
+		bufferTime(1000)//组合一秒内的信号
+		bufferTime(1000,2000)//组合一秒内的信号  下一次组合 和上一次组合间隔2000ms
+		bufferTime(1000,2000,10) 。。。最多组合10个信号
+		```
+	* bufferToggle 缓存 两个信号之间的原始信号
+		
+		```
+		bufferToggle(SubscribableOrPromise,(value)=>SubscribableOrPromise)
+		var source = Observable.interval(1000);
+		var Bclicks = Rx.Observable.fromEvent(document, 'click');
+		
+		source.bufferToggle(Bclicks,(event)=>{
+ 		 	return Rx.Observable.interval(10000)
+		})
+		收集  [在点击事件之后的 ,10s内] 信号
+		```
 	* 组合信号
 
 		* startWith 在信号之前插入信号量
 
-		* forkJoin 在多个信号完成后 将最后一个信号组合发送
+		* forkJoin 在多个信号完成后 将每一个最后一个信号组合发送
 
 		* zip
 
@@ -448,168 +491,25 @@
 ```
 export { Subject, AnonymousSubject } from './Subject';
 export { Observable } from './Observable';
-import './add/observable/bindCallback';
-import './add/observable/bindNodeCallback';
-import './add/observable/combineLatest';
-import './add/observable/concat';
-import './add/observable/defer';
-import './add/observable/empty';
-import './add/observable/forkJoin';
-import './add/observable/from';
-import './add/observable/fromEvent';
-import './add/observable/fromEventPattern';
-import './add/observable/fromPromise';
-import './add/observable/generate';
-import './add/observable/if';
-import './add/observable/interval';
-import './add/observable/merge';
-import './add/observable/race';
-import './add/observable/never';
-import './add/observable/of';
-import './add/observable/onErrorResumeNext';
-import './add/observable/pairs';
-import './add/observable/range';
-import './add/observable/using';
-import './add/observable/throw';
-import './add/observable/timer';
-import './add/observable/zip';
-import './add/observable/dom/ajax';
-import './add/observable/dom/webSocket';
-import './add/operator/buffer';
-import './add/operator/bufferCount';
-import './add/operator/bufferTime';
-import './add/operator/bufferToggle';
-import './add/operator/bufferWhen';
-import './add/operator/catch';
-import './add/operator/combineAll';
-import './add/operator/combineLatest';
-import './add/operator/concat';
-import './add/operator/concatAll';
-import './add/operator/concatMap';
-import './add/operator/concatMapTo';
-import './add/operator/count';
-import './add/operator/dematerialize';
-import './add/operator/debounce';
-import './add/operator/debounceTime';
-import './add/operator/defaultIfEmpty';
-import './add/operator/delay';
-import './add/operator/delayWhen';
-import './add/operator/distinct';
-import './add/operator/distinctUntilChanged';
-import './add/operator/distinctUntilKeyChanged';
-import './add/operator/do';
-import './add/operator/exhaust';
-import './add/operator/exhaustMap';
-import './add/operator/expand';
-import './add/operator/elementAt';
-import './add/operator/filter';
-import './add/operator/finally';
-import './add/operator/find';
-import './add/operator/findIndex';
-import './add/operator/first';
-import './add/operator/groupBy';
-import './add/operator/ignoreElements';
-import './add/operator/isEmpty';
-import './add/operator/audit';
-import './add/operator/auditTime';
-import './add/operator/last';
-import './add/operator/let';
-import './add/operator/every';
-import './add/operator/map';
-import './add/operator/mapTo';
-import './add/operator/materialize';
-import './add/operator/max';
-import './add/operator/merge';
-import './add/operator/mergeAll';
-import './add/operator/mergeMap';
-import './add/operator/mergeMapTo';
-import './add/operator/mergeScan';
-import './add/operator/min';
-import './add/operator/multicast';
-import './add/operator/observeOn';
-import './add/operator/onErrorResumeNext';
-import './add/operator/pairwise';
-import './add/operator/partition';
-import './add/operator/pluck';
-import './add/operator/publish';
-import './add/operator/publishBehavior';
-import './add/operator/publishReplay';
-import './add/operator/publishLast';
-import './add/operator/race';
-import './add/operator/reduce';
-import './add/operator/repeat';
-import './add/operator/repeatWhen';
-import './add/operator/retry';
-import './add/operator/retryWhen';
-import './add/operator/sample';
-import './add/operator/sampleTime';
-import './add/operator/scan';
-import './add/operator/sequenceEqual';
-import './add/operator/share';
-import './add/operator/shareReplay';
-import './add/operator/single';
-import './add/operator/skip';
-import './add/operator/skipLast';
-import './add/operator/skipUntil';
-import './add/operator/skipWhile';
-import './add/operator/startWith';
-import './add/operator/subscribeOn';
-import './add/operator/switch';
-import './add/operator/switchMap';
-import './add/operator/switchMapTo';
-import './add/operator/take';
-import './add/operator/takeLast';
-import './add/operator/takeUntil';
-import './add/operator/takeWhile';
-import './add/operator/throttle';
-import './add/operator/throttleTime';
-import './add/operator/timeInterval';
-import './add/operator/timeout';
-import './add/operator/timeoutWith';
-import './add/operator/timestamp';
-import './add/operator/toArray';
-import './add/operator/toPromise';
-import './add/operator/window';
-import './add/operator/windowCount';
-import './add/operator/windowTime';
-import './add/operator/windowToggle';
-import './add/operator/windowWhen';
-import './add/operator/withLatestFrom';
-import './add/operator/zip';
-import './add/operator/zipAll';
-export { Operator } from './Operator';
-export { Observer } from './Observer';
-export { Subscription } from './Subscription';
-export { Subscriber } from './Subscriber';
 export { AsyncSubject } from './AsyncSubject';
 export { ReplaySubject } from './ReplaySubject';
 export { BehaviorSubject } from './BehaviorSubject';
 export { ConnectableObservable } from './observable/ConnectableObservable';
+
 export { Notification } from './Notification';
-export { EmptyError } from './util/EmptyError';
-export { ArgumentOutOfRangeError } from './util/ArgumentOutOfRangeError';
-export { ObjectUnsubscribedError } from './util/ObjectUnsubscribedError';
-export { TimeoutError } from './util/TimeoutError';
-export { UnsubscriptionError } from './util/UnsubscriptionError';
-export { TimeInterval } from './operator/timeInterval';
-export { Timestamp } from './operators/timestamp';
+
 export { TestScheduler } from './testing/TestScheduler';
 export { VirtualTimeScheduler } from './scheduler/VirtualTimeScheduler';
 export { AjaxRequest, AjaxResponse, AjaxError, AjaxTimeoutError } from './observable/dom/AjaxObservable';
-export { pipe } from './util/pipe';
+
 import { AsapScheduler } from './scheduler/AsapScheduler';
 import { AsyncScheduler } from './scheduler/AsyncScheduler';
 import { QueueScheduler } from './scheduler/QueueScheduler';
 import { AnimationFrameScheduler } from './scheduler/AnimationFrameScheduler';
 
-
+export { pipe } from './util/pipe';
 export { audit } from './operators/audit';
 export { auditTime } from './operators/auditTime';
-export { buffer } from './operators/buffer';
-export { bufferCount } from './operators/bufferCount';
-export { bufferTime } from './operators/bufferTime';
-export { bufferToggle } from './operators/bufferToggle';
-export { bufferWhen } from './operators/bufferWhen';
 export { catchError } from './operators/catchError';
 export { combineAll } from './operators/combineAll';
 export { combineLatest } from './operators/combineLatest';
