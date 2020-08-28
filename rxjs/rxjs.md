@@ -188,6 +188,15 @@
 		
 		```
 		适用多层级Oberver  打平 信号
+		
+		* A:源Observable =>AValue
+		* B:投射Observable => BValue
+		* C:才是被订阅的值 any 默认是BValue
+		* D:concurrent A源 最大并发订阅数
+		* 
+		* A.mergeMap((Avalue,Ainex)=>B,(AValue,BValue,Aindex,Bindex)=>C|Any,D)
+	
+		
 		Obs.rang(0,10).map(x=>Obs.timer(1000).map(()=>x)) ==> 得到的是Observer 信号
 		
 		Observable.fromEvent("#input","keyup")
@@ -195,6 +204,14 @@
 		.flatMap(text=>http.get(text))
 		.sub((result)=>{
 		})
+		
+		1：20个资源需要加载
+		2：加载一个后延迟400进行下一个
+		3：最大并发为4
+		range(0,20).pipe(
+  			flatMap(url=>http(url).delay(400),(url,json)=>json,4),
+  			map(json=>json_data)
+		).subscribe(json_data=>{})
 		```
    * skip(num)
         忽略前几个信号
