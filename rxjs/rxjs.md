@@ -102,7 +102,7 @@
 		```
 		Observable.timer(2000,500)
 		延迟2000ms发送信号 然后在500ms一直发送
-		```	
+		```
 	* bindCallback	| bindNodeCallback(node 函数)
 
 		```
@@ -125,7 +125,7 @@
 		
 		```
 	* fromEvent 包装事件
-
+	
 		```
 		> DOM EventTarget**
 		This is an object with `addEventListener` and `removeEventListener` methods.
@@ -161,11 +161,11 @@
    * scan 类似数组reduce
        应用一个函数 在每次的信号上   （累加操作）
        [1,2,3,4].scan((x,y)=>x+y,initv) ===>1 3 6 10
-        
+       
    * take(num)
         是信号只能发送num次 
    * takeLast(num) 在结束信号后  仅仅下发最后num次
-   	
+  
    	* takeLastWithTime 在结束信号后  仅仅下发规定时间内的信号
 
    	* takeLastBuffer(3);在结束信号后  会把最后num信号 作为一个信号发出
@@ -177,7 +177,7 @@
    * max | min
         数字 在完成时  发出最大的一个值
    * Map 改变每个信号
-       
+     
        ```
        from([{value:0},{value:1}])
        .map(x=>x.value)
@@ -195,7 +195,7 @@
 		* D:concurrent A源 最大并发订阅数
 		* 
 		* A.mergeMap((Avalue,Ainex)=>B,(AValue,BValue,Aindex,Bindex)=>C|Any,D)
-	
+		
 		
 		Obs.rang(0,10).map(x=>Obs.timer(1000).map(()=>x)) ==> 得到的是Observer 信号
 		
@@ -216,9 +216,9 @@
    * skip(num)
         忽略前几个信号
    * skipLast
-   
+  
    * startWith 在信号量 最前方加入一个信号
-        
+     
         ```
         Observabale.from([1,2,3,4,5]).startWith(0)
         0,1,2,3,4,5, 
@@ -227,7 +227,7 @@
 
 		```
 		 控制事件触发频率 (以消息为准)
-
+		
         消息队 1    AD  3     5 
         时间对 ---- 发送1
         时间对      ---- A (有新的消息 D) 放弃消息 重新计时
@@ -239,33 +239,33 @@
 		
 		```
         控制事件触发频率
-
+		
         消息队 1    AD  3     5 
         时间对 ----|----|----|----|
-
+		
         时间间隔内 只容许发送一个消息
                 1  A  5  最后一个(要看是不是在时间范围类 判断是否发送)
 		```
 	 * timeInterval 记录信号量时间间隔
-	 
+	
 	 	```
-			timeInterval Obs<T>==>Obs<TimeInterval<T>>
+	 		timeInterval Obs<T>==>Obs<TimeInterval<T>>
 	 	```
     *  timestamp Obs<T>==>Obs<timestamp<T>>     
-    	
+  
     	```
     	记录信号的时间错
     	```
 
 	* timeout 接受时间段内的信号 时间段后 会结束信号
     	
-    	```
+    	
     	.delay(5000)
-	    .timeout(200, 'Timeout has occurred.');
-	
-	    .delay(5000)
-	    .timeout(200, Promise.resolve(42));   
-    	```
+	  	.timeout(200, 'Timeout has occurred.');
+	  	
+	  	.delay(5000)
+	  	.timeout(200, Promise.resolve(42));   
+    
 
 	* publish 转换为ConnectableObservable 可控制信号量
 		
@@ -277,6 +277,7 @@
 		```
 		在源 Completed后 发送给订阅者最后一个信号量
 		```
+		
 	* replay
 	
 		```
@@ -284,6 +285,7 @@
 		
 		replay操作 之后的所有信号会被保存(缓存) 所有订阅者都可以订阅到信号 。即使信号是在被订阅之前发出
 		```
+		
 	* refCount
 		
 		```
@@ -302,35 +304,37 @@
 		源ConnectableObservable 仅仅被订阅一次
 				
 		```
+		
 	* 信号共享 【针对多次被订阅的情况】
-
+	
 		```
 		share == publish + refCount
 		```
-
-		```
-		let sub = Observable.create((obs)=>{
+  
+  	```
+  	let sub = Observable.create((obs)=>{
             obs.next(1)
             obs.next(2)
             obs.next(3)
             //会被调用两次
             obs.complete()
         })
-        
-        sub.subscribe()
-        sub.subscribe()
-		```
-		```
-		b = Observable.create((obs)=>{
+	      
+	      sub.subscribe()
+	      sub.subscribe()
+  	```
+  	```
+  	b = Observable.create((obs)=>{
             //这里只会 调用一次
             obs.next(1)
             obs.next(2)
             obs.next(3)
             obs.complete()
-        }).publish().refCount()
-        b.subscribe()
-        b.subscribe()
+	      }).publish().refCount()
+	      b.subscribe()
+	      b.subscribe()
 		```
+		
 	* buffer (缓存信号 直到边界信号出现) 
 		
 		```
@@ -342,10 +346,11 @@
 			-1--2-3-|---4-5|-6-7-8-9-10-|-
 			[1,2,3] [4,5] [6,,7,8,9,10]
 		```
+		
 	* bufferWhen ~=buffer
 	
 	* bufferCount(bufferSize,startBufferEvery?) 基于buffer
-
+	
 		```
 		bufferCount(2) 有两个信号后将其组合发送
 		startBufferEvery：number 分配一组之后 向后偏移多少
@@ -355,6 +360,7 @@
 		bufferCount(2,1) ==>[1,2] [2,3],[3,4],[4,5] [5,6][ 6,7]
 		bufferCount(2,3) ==>[1,2],[4,5] [7]
 		```
+		
 	* bufferTime(bufferTimeSpan: number, bufferCreationInterval: number, maxBufferSize: number) 缓存一定时间内的信号 然后组合发出
 		
 		```
@@ -362,6 +368,7 @@
 		bufferTime(1000,2000)//组合一秒内的信号  下一次组合 和上一次组合间隔2000ms
 		bufferTime(1000,2000,10) 。。。最多组合10个信号
 		```
+		
 	* bufferToggle 缓存 两个信号之间的原始信号
 		
 		```
@@ -370,88 +377,92 @@
 		var Bclicks = Rx.Observable.fromEvent(document, 'click');
 		
 		source.bufferToggle(Bclicks,(event)=>{
- 		 	return Rx.Observable.interval(10000)
+			return Rx.Observable.interval(10000)
 		})
 		收集  [在点击事件之后的 ,10s内] 信号
 		```
-	* 组合信号
-
-		* startWith 在信号之前插入信号量
-
-		* forkJoin 在多个信号完成后 将每一个最后一个信号组合发送
-
-		* zip
-
-			```
-			Observable.zip
-			多个消息源  
-			把 对应索引 下的多个消息源 组合之后在发出 
-			必须对应所有索引都有消息 在发出
-			Ob.zip(sourceA,sourceB,(A,B)=>T).sub(T)
-			```
-		* combineLatest
-
-			```
-			Observable. combineLatest
-			多个消息源  
-			每次的消息源 都会组合最近的消息 发出
-			1  2   3  
-			
-			a    c
-			
-			1a 2a 2c 3c
-			
-			Ob.combineLatest(sourceA,sourceB,(A,B)=>T).sub(T)
-			```
-		* merge
-			
-			```
-			组合多个信号源 然后在一次发出
-                1    2  3
-                   a      b
-                  merge
-                1 a 2 3 b
-			```
-	   * pipe
-	
-			```
-			一个管道  可以定义你自己的信号处理过程 （自定义操作符）
-	        pipeable 好处是 自定义的操作符 不需要再每个Observable原型上绑定 
-	                 直接通过现有pipe就可以达到使用所有操作符的目的
 		
-	        Observale.timer(1000).pipe(
-	            map(index=>index+2),管道1
-	            filter(index=>index%2==1),管道2
-	            take(3), 管道3
-	            CustomPipe()管道4
-	        )
-	        
-	        操作符:Observale<T> => Observable<R>
-			    function CustomPipe(num){
-			        return (source)=>{
-			            return Observable.create((obs)=>{
-			
-			                 return source.take(num).subscribe((s)=>obs.next(s),(err)=>{
-			                    obs.error(err)
-			                },()=>{
-			                    obs.complate()
-			                })
-			            })
-			        }
-			    }
-			    Observale.create().pipe(
-			        CustomPipe(100),
-			        map(xxx)
-			    )
-			```
+		
+
+ 		
+ 	* 组合信号
+ 	
+ 		* startWith 在信号之前插入信号量
+ 	
+ 		* forkJoin 在多个信号完成后 将每一个最后一个信号组合发送
+ 	
+ 		* zip
+ 	
+ 			```
+ 			Observable.zip
+ 			多个消息源  
+ 			把 对应索引 下的多个消息源 组合之后在发出 
+ 			必须对应所有索引都有消息 在发出
+ 			Ob.zip(sourceA,sourceB,(A,B)=>T).sub(T)
+ 			```
+ 		* combineLatest
+ 	
+ 			```
+ 			Observable. combineLatest
+ 			多个消息源  
+ 			每次的消息源 都会组合最近的消息 发出
+ 			1  2   3  
+ 			
+ 			a    c
+ 			
+ 			1a 2a 2c 3c
+ 			
+ 			Ob.combineLatest(sourceA,sourceB,(A,B)=>T).sub(T)
+ 			```
+ 		* merge
+ 			
+ 			```
+ 			组合多个信号源 然后在一次发出
+ 	            1    2  3
+ 	               a      b
+ 	              merge
+ 	            1 a 2 3 b
+ 			```
+ 	   * pipe
+ 	
+ 			```
+ 			一个管道  可以定义你自己的信号处理过程 （自定义操作符）
+ 	        pipeable 好处是 自定义的操作符 不需要再每个Observable原型上绑定 
+ 	                 直接通过现有pipe就可以达到使用所有操作符的目的
+ 		
+ 	        Observale.timer(1000).pipe(
+ 	            map(index=>index+2),管道1
+ 	            filter(index=>index%2==1),管道2
+ 	            take(3), 管道3
+ 	            CustomPipe()管道4
+ 	        )
+ 	        
+ 	        操作符:Observale<T> => Observable<R>
+ 			    function CustomPipe(num){
+ 			        return (source)=>{
+ 			            return Observable.create((obs)=>{
+ 			
+ 			                 return source.take(num).subscribe((s)=>obs.next(s),(err)=>{
+ 			                    obs.error(err)
+ 			                },()=>{
+ 			                    obs.complate()
+ 			                })
+ 			            })
+ 			        }
+ 			    }
+ 			    Observale.create().pipe(
+ 			        CustomPipe(100),
+ 			        map(xxx)
+ 			    )
+ 			```
 * 高阶Observer  信号量为Observer
 	
 	```
 	flatMap(mergeMap)
-	combineAll
-	concatAll
-	mergeAll
-	switch
+	combineAll 等待所以输入链全部完成 然后再往下处理 然后将高阶Observable转为一阶
+	concatAll 保证一次输入完成后在处理第二次输入  然后将高阶Observable转为一阶
+	mergeAll 单纯合并所有输入 然后将高阶Observable转为一阶
+	switchAll 如果下一次输入时 ，上一个输入没有完成 会舍弃上一次。仅处理这一次 。然后将高阶Observable转为一阶
 	switchMap
 	```
 
@@ -472,10 +483,11 @@
 	
 	```
 	用于处理信号量的发布
+
  	let froms = Observable.from([])
  	froms.subscribe(next,error,complete)对应处理
  	froms.subscribe(NextObserver<T> | ErrorObserver<T> | CompletionObserver<T>)对接另一个订阅
-	```
+ 	```
 * 资源释放 Subscription
 
 	```
