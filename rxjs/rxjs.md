@@ -22,7 +22,7 @@
 		Subject         尽量不直接使用这个类（Observale 或者 下面的代替）
 		BehaviorSubject 需要指定初始值 会保留最后发送一次数据 在下一个订阅后立即发出
 		ReplaySubject  会保留指定个数的 数据  订阅后发出
-		PublishSubject  仅仅把订阅之(后)的数据发送 订阅之(前)的数据不会发送
+		// PublishSubject  仅仅把订阅之(后)的数据发送 订阅之(前)的数据不会发送
 		AsyncSubject  仅仅发送complete 之前的一个数据
 	```
  [Document](https://cn.rx.js.org/manual/usage.html#h13)
@@ -154,36 +154,44 @@
 * 操作符
 	* do | tap | let
         不会改变Obser的任何东西 只是增加一步回调
+    
    * toPromise   被 Observable.toPromise 替代
         只能接受完成信息Promise
+        
    * delay
         消息队列整体延迟多少毫秒
+        
    * scan 类似数组reduce
        应用一个函数 在每次的信号上   （累加操作）
        [1,2,3,4].scan((x,y)=>x+y,initv) ===>1 3 6 10
        
    * take(num)
         是信号只能发送num次 
+	      
    * takeLast(num) 在结束信号后  仅仅下发最后num次
   
-   	* takeLastWithTime 在结束信号后  仅仅下发规定时间内的信号
-
-   	* takeLastBuffer(3);在结束信号后  会把最后num信号 作为一个信号发出
+	 	* takeLastWithTime 在结束信号后  仅仅下发规定时间内的信号
+  
+    * takeLastBuffer(3);在结束信号后  会把最后num信号 作为一个信号发出
+  
    	* takeLastBufferWithTime(5000);
-	
+  
    * filter
         过滤信号 true 的可以向下执行
       * first | last  仅仅发送第一个 |最后一个信号(完成前的第一个)
+      
    * max | min
         数字 在完成时  发出最大的一个值
+        
    * Map 改变每个信号
-     
-       ```
-       from([{value:0},{value:1}])
-       .map(x=>x.value)
-       ==
-       .pluck("value")
-       ```
+	   
+	     ```
+	     from([{value:0},{value:1}])
+	     .map(x=>x.value)
+	     ==
+	     .pluck("value")
+	     ```
+	     
 	* flatMap 适用于inner Observable  高阶
 		
 		```
@@ -201,190 +209,199 @@
 		
 		Observable.fromEvent("#input","keyup")
 		.map(event=>inpuText)
-		.flatMap(text=>http.get(text))
-		.sub((result)=>{
+  	.flatMap(text=>http.get(text))
+  	.sub((result)=>{
 		})
 		
-		1：20个资源需要加载
-		2：加载一个后延迟400进行下一个
-		3：最大并发为4
-		range(0,20).pipe(
+  	1：20个资源需要加载
+  	2：加载一个后延迟400进行下一个
+  	3：最大并发为4
+  	range(0,20).pipe(
   			flatMap(url=>http(url).delay(400),(url,json)=>json,4),
   			map(json=>json_data)
-		).subscribe(json_data=>{})
-		```
+  	).subscribe(json_data=>{})
+  	```
+  	
    * skip(num)
         忽略前几个信号
-   * skipLast
-  
-   * startWith 在信号量 最前方加入一个信号
+	      
+	 * skipLast
+	
+	 * startWith 在信号量 最前方加入一个信号
      
         ```
         Observabale.from([1,2,3,4,5]).startWith(0)
         0,1,2,3,4,5, 
         ```
-   * debounceTime
-
+        
+	 * debounceTime
+	
 		```
 		 控制事件触发频率 (以消息为准)
-		
-        消息队 1    AD  3     5 
+  	
+	      消息队 1    AD  3     5 
         时间对 ---- 发送1
         时间对      ---- A (有新的消息 D) 放弃消息 重新计时
-        时间对       ---- D (有新的消息 3) 放弃消息 重新计时
+	      时间对       ---- D (有新的消息 3) 放弃消息 重新计时
         时间对           ---- 3 无新的消息 发送3
                         最后一个消息5 必定会发送
 		```
+		
 	* throttleTime
 		
 		```
-        控制事件触发频率
-		
+	      控制事件触发频率
+  	
         消息队 1    AD  3     5 
         时间对 ----|----|----|----|
-		
+  	
         时间间隔内 只容许发送一个消息
-                1  A  5  最后一个(要看是不是在时间范围类 判断是否发送)
+	              1  A  5  最后一个(要看是不是在时间范围类 判断是否发送)
 		```
-	 * timeInterval 记录信号量时间间隔
-	
-	 	```
-	 		timeInterval Obs<T>==>Obs<TimeInterval<T>>
-	 	```
-    *  timestamp Obs<T>==>Obs<timestamp<T>>     
+  	
+   * timeInterval 记录信号量时间间隔
   
-    	```
-    	记录信号的时间错
-    	```
+	      ```
+	      timeInterval Obs<T>==>Obs<TimeInterval<T>>
+	      ```
+	
+        
 
+	  * timestamp Obs<T>==>Obs<timestamp<T>>     
+	
+	      ```
+	      记录信号的时间错
+	      ```
+	
+	      
+	
 	* timeout 接受时间段内的信号 时间段后 会结束信号
-    	
-    	
-    	.delay(5000)
+	  	
+	  	
+	  	.delay(5000)
 	  	.timeout(200, 'Timeout has occurred.');
 	  	
 	  	.delay(5000)
 	  	.timeout(200, Promise.resolve(42));   
-    
-
+	
 	* publish 转换为ConnectableObservable 可控制信号量
-		
-		```
-		Obs.publish()===> ConnectableObservable
-		```
-		* publishLast
-		
-		```
-		在源 Completed后 发送给订阅者最后一个信号量
-		```
-		
+	
+	  ```
+	  Obs.publish()===> ConnectableObservable
+	  ```
+	  * publishLast
+	
+	  ```
+	  在源 Completed后 发送给订阅者最后一个信号量
+	  ```
+	
 	* replay
 	
-		```
-		确保所有观察者看到相同的信号
-		
-		replay操作 之后的所有信号会被保存(缓存) 所有订阅者都可以订阅到信号 。即使信号是在被订阅之前发出
-		```
-		
-	* refCount
-		
-		```
-		ConnectableObservable ===> Observable
-		
-		内部订阅 ConnectableObservable【源】  
-		
-		本身被订阅 只是内部进行源信号量的转发
-		
-		【源】	ConnectableObservable == [Observable1]
-			【refCount】===>订阅Observable1(connect) ==> Observable2
-				Observable2被订阅1 --->
-				Observable2被订阅2 --->
-				Observable2被订阅3 --->
-				
-		源ConnectableObservable 仅仅被订阅一次
-				
-		```
-		
-	* 信号共享 【针对多次被订阅的情况】
+	  ```
+	  确保所有观察者看到相同的信号
+	  
+	  replay操作 之后的所有信号会被保存(缓存) 所有订阅者都可以订阅到信号 。即使信号是在被订阅之前发出
+	  ```
 	
-		```
-		share == publish + refCount
-		```
+	* refCount
+	
+	  ```
+	  ConnectableObservable ===> Observable
+	  
+	  内部订阅 ConnectableObservable【源】  
+	  
+    本身被订阅 只是内部进行源信号量的转发
+    
+    【源】	ConnectableObservable == [Observable1]
+    	【refCount】===>订阅Observable1(connect) ==> Observable2
+    		Observable2被订阅1 --->
+    		Observable2被订阅2 --->
+    		Observable2被订阅3 --->
+    		
+    源ConnectableObservable 仅仅被订阅一次
+	  		
+	  ```
+	
+  * 信号共享 【针对多次被订阅的情况】
   
-  	```
-  	let sub = Observable.create((obs)=>{
-            obs.next(1)
-            obs.next(2)
-            obs.next(3)
-            //会被调用两次
-            obs.complete()
-        })
+    ```
+    share == publish + refCount
+    ```
+  
+    ```
+    let sub = Observable.create((obs)=>{
+	          obs.next(1)
+	          obs.next(2)
+	          obs.next(3)
+	          //会被调用两次
+	          obs.complete()
+	      })
 	      
 	      sub.subscribe()
 	      sub.subscribe()
-  	```
-  	```
-  	b = Observable.create((obs)=>{
-            //这里只会 调用一次
-            obs.next(1)
-            obs.next(2)
-            obs.next(3)
-            obs.complete()
+	  ```
+	  ```
+	  b = Observable.create((obs)=>{
+	          //这里只会 调用一次
+	          obs.next(1)
+	          obs.next(2)
+	          obs.next(3)
+	          obs.complete()
 	      }).publish().refCount()
 	      b.subscribe()
 	      b.subscribe()
-		```
-		
+	  ```
+	
 	* buffer (缓存信号 直到边界信号出现) 
-		
-		```
-			let source =Observel.interval(1000) //信号源
-			var clicks = Rx.Observable.fromEvent(document, 'click');//边界信号
-			source.buffer(clicks).sub(a:[]=>{})
-			
-			收集每次点击事件之前的信号并组合发送
-			-1--2-3-|---4-5|-6-7-8-9-10-|-
-			[1,2,3] [4,5] [6,,7,8,9,10]
-		```
-		
+	
+	  ```
+	  	let source =Observel.interval(1000) //信号源
+	  	var clicks = Rx.Observable.fromEvent(document, 'click');//边界信号
+	  	source.buffer(clicks).sub(a:[]=>{})
+	  	
+	  	收集每次点击事件之前的信号并组合发送
+	  	-1--2-3-|---4-5|-6-7-8-9-10-|-
+	  	[1,2,3] [4,5] [6,,7,8,9,10]
+	  ```
+	
 	* bufferWhen ~=buffer
 	
 	* bufferCount(bufferSize,startBufferEvery?) 基于buffer
 	
-		```
-		bufferCount(2) 有两个信号后将其组合发送
-		startBufferEvery：number 分配一组之后 向后偏移多少
-		
-		1 2 3  4 5 6 7
-		bufferCount(2) [1,2][3,4][5,6][7]
-		bufferCount(2,1) ==>[1,2] [2,3],[3,4],[4,5] [5,6][ 6,7]
-		bufferCount(2,3) ==>[1,2],[4,5] [7]
-		```
-		
+	  ```
+	  bufferCount(2) 有两个信号后将其组合发送
+	  startBufferEvery：number 分配一组之后 向后偏移多少
+	  
+	  1 2 3  4 5 6 7
+	  bufferCount(2) [1,2][3,4][5,6][7]
+	  bufferCount(2,1) ==>[1,2] [2,3],[3,4],[4,5] [5,6][ 6,7]
+	  bufferCount(2,3) ==>[1,2],[4,5] [7]
+	  ```
+	
 	* bufferTime(bufferTimeSpan: number, bufferCreationInterval: number, maxBufferSize: number) 缓存一定时间内的信号 然后组合发出
-		
-		```
-		bufferTime(1000)//组合一秒内的信号
-		bufferTime(1000,2000)//组合一秒内的信号  下一次组合 和上一次组合间隔2000ms
-		bufferTime(1000,2000,10) 。。。最多组合10个信号
-		```
-		
+	
+	  ```
+	  bufferTime(1000)//组合一秒内的信号
+	  bufferTime(1000,2000)//组合一秒内的信号  下一次组合 和上一次组合间隔2000ms
+	  bufferTime(1000,2000,10) 。。。最多组合10个信号
+	  ```
+	
 	* bufferToggle 缓存 两个信号之间的原始信号
-		
-		```
-		bufferToggle(SubscribableOrPromise,(value)=>SubscribableOrPromise)
-		var source = Observable.interval(1000);
-		var Bclicks = Rx.Observable.fromEvent(document, 'click');
-		
-		source.bufferToggle(Bclicks,(event)=>{
-			return Rx.Observable.interval(10000)
-		})
-		收集  [在点击事件之后的 ,10s内] 信号
-		```
-		
-		
+	
+	  ```
+	  bufferToggle(SubscribableOrPromise,(value)=>SubscribableOrPromise)
+	  var source = Observable.interval(1000);
+	  var Bclicks = Rx.Observable.fromEvent(document, 'click');
+	  
+	  source.bufferToggle(Bclicks,(event)=>{
+	  	return Rx.Observable.interval(10000)
+	  })
+	  收集  [在点击事件之后的 ,10s内] 信号
+	  ```
+	
+	  
 
- 		
+
  	* 组合信号
  	
  		* startWith 在信号之前插入信号量
@@ -439,7 +456,7 @@
  	        
  	        操作符:Observale<T> => Observable<R>
  			    function CustomPipe(num){
- 			        return (source)=>{
+ 			        return (source:Observable)=>{
  			            return Observable.create((obs)=>{
  			
  			                 return source.take(num).subscribe((s)=>obs.next(s),(err)=>{
@@ -478,6 +495,7 @@
 
 	* retry(num) 当接受到error后 再次订阅源
         Object.from([1,2,onError,3,4,5]).retry(2).subscribe()
+    
     * retryWhen
 * 订阅
 	
@@ -509,8 +527,8 @@
 	> asap 微任务的队列调度 Promise.resolve().then(() => task)
 	> async 宏任务 setInterval调度
 	> animationFrame 异步 
-	subscribeOn 用于指定发送信号量的调度
 	
+	subscribeOn 用于指定发送信号量的调度
 	observeOn 用于改变next error Complete执行时机
 		obs.next()| error() | Complete()
 	
