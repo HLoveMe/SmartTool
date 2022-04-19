@@ -190,7 +190,7 @@
       }，
       concatAll(),// 比如快速点击三次，会按顺序输出三次 0,1,2
       switchAll 快速点击，只输出一次0,1,2，也就是说老的舍去只保留最新的
-      mergeAll 快速点击，会重复的输出多次0，1等。点击越多下，最后送出的频率就会越快。不会舍去，每次都会输出
+      mergeAll(2可并发数) 快速点击，会重复的输出多次0，1等。点击越多下，最后送出的频率就会越快。不会舍去，每次都会输出
     ),
     concatAll:如果消息源不能保证同步顺序,内部会缓存数据,数据流完成后，它会订阅下一个缓存的数据
     //of(A,B,C).pipe(concatAll())
@@ -208,6 +208,13 @@
         console.log("event",event)
         // 容许接受上一个信号
         return interval(1000).pipe(take(3))
+      }，function(
+      	outerValue: 来自源的值
+        innerValue: 来自投射的 Observable 的值
+        outerIndex: 来自源的值的 "index"
+        innerIndex: 来自投射的 Observable 的值的 "index"
+      ){
+        return R
       })
     ).subscribe({
       next:v=>console.log('re:',v)
@@ -220,18 +227,41 @@
     
 
   * do | tap | let
-        不会改变Obser的任何东西 只是增加一步回调
-
+    
+    不会改变Obser的任何东西 只是增加一步回调
+    
+  * count 统计计数
+    
+  * every 判断每一个是否满足条件，结束后发出是否所有的都满足条件
+    
+  * find 只发出第一个满足条件的值。
+    
+  * findIndex 只发出第一个满足条件的值所在的索引
+    
+  * first 发出第一个值 | 第一个满足条件的值
+    
+  * elementAt 只发出源的第i个值，并结束。 
+    
    * toPromise   被 Observable.toPromise 替代
         只能接受完成信息Promise
 
    * delay
         消息队列整体延迟多少毫秒
 
-   * scan 类似数组reduce
+   * delayWhen 延迟消息，延迟到什么时候由参数决定
+     
+   * scan 类似数组 并发送中间值
        应用一个函数 在每次的信号上   （累加操作）
        [1,2,3,4].scan((x,y)=>x+y,initv) ===>1 3 6 10
 
+   * reduce 累加 并在结束后发送累加的值
+     
+   * ignoreElements 仅仅发送complate error
+     
+   * isEmpty 源发出值则转为false,源完成前没有发出任何值则发出true
+     
+   * materialize 将Observer源信号转为Notifacation发送
+     
    * take(num)
         是信号只能发送num次 
 
@@ -243,24 +273,105 @@
 
     * takeLastBufferWithTime(5000);
 
+    * distinct 他会根据返回值和 [之前所有的返回值] 来判断不同，不同的才容许发送
+
+        ```
+        此操作符会使用 Set 的最小化实现，此实现在底层依赖于 Array 和 indexOf
+        Observable.of(1, 1, 2, 2, 2, 1, 2, 3, 4, 3, 2, 1)
+          .distinct()
+          .subscribe(x => console.log(x)); // 1, 2, 3, 4
+          
+        Observable.of<Person>(
+            { age: 4, name: 'Foo'},
+            { age: 7, name: 'Bar'},
+            { age: 5, name: 'Foo'})
+            .distinct((p: Person) => p.name)
+            .subscribe(x => console.log(x)); 
+            // { age: 4, name: 'Foo'},
+            //{ age: 7, name: 'Bar'},
+        ```
+
+        
+
+   * distincUntilChanged 和distinct 类似。但是只需要和前一个信号比较不同就可以。
+     
+   * distinctUntilKeyChanged
+
+      ```
+      Observable.of<Person>(
+          { age: 4, name: 'Foo'},
+          { age: 7, name: 'Bar'},
+          { age: 5, name: 'Foo'},
+          { age: 6, name: 'Foo'})
+      .distinctUntilChanged((p: Person, q: Person) => p.name === q.name)
+      .distinctUntilKeyChanged('name') 
+      .distinctUntilKeyChanged('name'，(x: string, y: string) => x.substring(0, 3) === y.substring(0, 3))
+      ```
+
+      
+
+   * groupBy 按照某个归着分组，派发信号为GroupedObservable 每一组为GroupedObservable
+     
+      ```
+      of<{id:number,name:string}>(
+       { id: 1, name: 'aze1' },
+        { id: 2, name: 'sf2' },
+        { id: 2, name: 'dg2' },
+        { id: 1, name: 'erg1' },
+        { id: 1, name: 'df1' },
+        { id: 2, name: 'sfqfb2' },
+        { id: 3, name: 'qfs3' },
+        { id: 2, name: 'qsgqsfg2' }
+      ).
+      pipe(
+        groupBy(
+        (p) => p.id,
+        分组存活时间
+        ),
+        let((group)=>{
+        	//新的分组就会触发
+       	return group
+        })
+        flatMap(group =>{
+          return group.pipe(
+            reduce((acc,cur)=>[...acc,cur],[]), // 将数据组合为数组 完成后在派发
+          )
+        }),
+      )
+      .subscribe(p => console.log(p));
+      ```
+      
+      
+      
    * filter
       过滤信号 true 的可以向下执行
 
       * first | last  仅仅发送第一个 |最后一个信号(完成前的第一个)
 
    * max | min
+     
+        ```
         数字 在完成时  发出最大的一个值
-
-   * Map 改变每个信号
+        或者指定比较函数来判断
+        ```
+        
+        
+        
+   * pluck 解构 |  Map 改变每个信号
 
        ```
        from([{value:0},{value:1}])
        .map(x=>x.value)
        ==
-       .pluck("value")
+       .pluck("value") 
+       .pluck("value",'xxx') == v.value.xxx 
        ```
 
-  * flatMap 适用于inner Observable  高阶
+  * mapTo mapTo('Hi')====>map(x=>'Hi')
+
+    
+    
+  * flatMap === mergeMap 适用于inner Observable  高阶
 
     ```
     适用多层级Oberver  打平 信号
@@ -273,27 +384,46 @@
     * A.mergeMap((Avalue,Ainex)=>B,(AValue,BValue,Aindex,Bindex)=>C|Any,D)
     
     
-    Obs.rang(0,10).map(x=>Obs.timer(1000).map(()=>x)) ==> 得到的是Observer 信号
+    Obs.rang(0,10).map(x=>Obs.timer(1000).map(()=>x)) ==> 得到的是Observer 信号，而不是真的值
     
     Observable.fromEvent("#input","keyup")
     .map(event=>inpuText)
-    .flatMap(text=>http.get(text))
+    .flatMap(text=>http.get(text))//高阶转一阶
     .sub((result)=>{
     })
     
-    1：20个资源需要加载
-    2：加载一个后延迟400进行下一个
-    3：最大并发为4
-    range(0,20).pipe(
-    		flatMap(url=>http(url).delay(400),(url,json)=>json,4),
-    		map(json=>json_data)
+    输入框.pipe(
+    	flatMap(url=>http(url),(url,json)=>json,4),
+    	map(json=>json_data)
     ).subscribe(json_data=>{})
     ```
-
+    
+   * switchAll
+     
+        ```
+        输入框.pipe(
+        	flatMap(url=>http(url),(url,json)=>json,1),
+        	map(json=>json_data)
+        ).subscribe(json_data=>{})
+        
+        // 问题 后请求的数据可能会先到达
+        
+        输入框.pipe(
+        	flatMap(url=>http(url),(url,json)=>json,1),
+        	switchAll(),// 新的数据来 会取消之前的信号
+        	map(json=>json_data)
+        ).subscribe(json_data=>{})
+        
+        ```
+        
+        
+        
    * skip(num)
         忽略前几个信号
 
    * skipLast
+
+   * endWith 在信号量 最后方加入一个信号
 
    * startWith 在信号量 最前方加入一个信号
 
@@ -302,18 +432,30 @@
         0,1,2,3,4,5, 
         ```
 
+   * debounce 只有当duration Observer 发出信号(或完成)后，才会发送source 缓存的最后的一个值
+
+        ```
+        var clicks = Rx.Observable.fromEvent(document, 'click');
+        var result = clicks.debounce(() => Rx.Observable.interval(1000));
+        result.subscribe(x => console.log(x));
+        ```
+
+        
+
    * debounceTime
 
-    ```
-     控制事件触发频率 (以消息为准)
-    
-       消息队 1    AD  3     5 
-       时间对 ---- 发送1
-       时间对      ---- A (有新的消息 D) 放弃消息 重新计时
-       时间对       ---- D (有新的消息 3) 放弃消息 重新计时
-       时间对           ---- 3 无新的消息 发送3
-                       最后一个消息5 必定会发送
-    ```
+        ```
+         控制事件触发频率 (以消息为准)
+        
+           消息队 1    AD  3     5 
+           时间对 ---- 发送1
+           时间对      ---- A (有新的消息 D) 放弃消息 重新计时
+           时间对       ---- D (有新的消息 3) 放弃消息 重新计时
+           时间对           ---- 3 无新的消息 发送3
+                           最后一个消息5 必定会发送
+        ```
+
+  * defaultifEmpty 源 Observable 在完成之前没有发出任何 next 值，则发出给定的值
 
   * throttleTime
 
@@ -327,7 +469,7 @@
                 1  A  5  最后一个(要看是不是在时间范围类 判断是否发送)
     ```
 
-   * timeInterval 记录信号量时间间隔
+   * mergeMaptimeInterval 记录信号量时间间隔
 
         ```
         timeInterval Obs<T>==>Obs<TimeInterval<T>>
@@ -356,6 +498,7 @@
 
     ```
     Obs.publish()===> ConnectableObservable
+    ConnectableObservable 只有调用connect 之后才会发送
     ```
     * publishLast
 
@@ -519,9 +662,11 @@
 
 * 组合信号
 
-  * concat / 
+  * concat 
 
-  * startWith 在信号之前插入信号量
+  * pairwise 默认将信号 两两组合
+
+  * toArray() 在信号完成之前将所有信号组合为一个数组
 
   * forkJoin 在多个信号完成后 将每一个最后一个信号组合发送
 
@@ -586,6 +731,8 @@
 
     
 
+    
+
   * merge
 
     ```
@@ -596,19 +743,28 @@
     1 a 2 3 b
     ```
 
+  * mergeAll(2并发数)见上
+
+  * mergeMapTo  将每个信号都转为xx 
+
+  * mergeScan merge上增加累计器
+
+    
+
+    
+
     
 
 * 高阶Observer  信号量为Observer
 	
 	```
-	flatMap(mergeMap)
+	flatMap===mergeMap
 	combineAll 等待所以输入链全部完成 然后再往下处理 然后将高阶Observable转为一阶 【见上】
 	concatAll 保证一次输入完成后在处理第二次输入  然后将高阶Observable转为一阶 【见上】
 	mergeAll 单纯合并所有输入 然后将高阶Observable转为一阶 【见上】
 	switchAll 如果下一次输入时 ，上一个输入没有完成 会舍弃上一次。仅处理这一次 。然后将高阶Observable转为一阶【见上】
-	switchMap
 	```
-
+	
 * 错误处理
 	
 	* catch
@@ -623,6 +779,7 @@
         Object.from([1,2,onError,3,4,5]).retry(2).subscribe()
     
     * retryWhen
+  
 * 订阅
 	
 	```
@@ -642,6 +799,7 @@
 	
 	本订阅释放掉 其所有子subscriptions也会被释放
 	```
+	
 * 调度器 Scheduler
 	
 	```
