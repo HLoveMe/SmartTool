@@ -40,6 +40,15 @@
   		return AnonymousSubscription | Function | void;
   	})
   	```
+  	
+  * defer
+
+  	```
+  	等待订阅时，才会创建订阅信号。每次订阅都是新的
+  	```
+  	
+    
+    
   * create
 
   	```
@@ -49,17 +58,20 @@
             return AnonymousSubscription | Function | void
         })
   	```
+  	
   * of 
   	
   	```[ArrayObservable]
   	Observable.of(1)
   	Observable.of(1,2,3)
   	```
+  	
   * just | return
 
   	```
   	仅仅一个信号量 然后Completed
   	```
+  	
   * from
 
   	```FromObservable
@@ -72,6 +84,7 @@
   		Observable.range(1,10).take(5).map(a=>a+100)
   	)
   	```
+  	
   * repeat 
   	
   	```
@@ -79,12 +92,14 @@
   	Observable.repeat("zzh",2)
   		"zzh","zzh"
   	```
+  	
   * fromPromise
 
   	```PromiseObservable
   	
   	Observable.fromPromise(Promise.reslove(1))
   	```
+  	
   * range 包装一个连续递增
 
   	```RangeObservable
@@ -92,17 +107,20 @@
   	Observable.range(-10,10)
   		-10,-9 .....10个
   	```
+  	
   * interval 创建一个连续间隔 发送信号量的订阅
   	
   	```IntervalObservable
   	Observable.interval(1000)发送一个连续的  1000ms间隔的信号
   	```
+  	
   * timer 一个具有初始延迟 连续
 
   	```
   	Observable.timer(2000,500)
   	延迟2000ms发送信号 然后在500ms一直发送
   	```
+  	
   * bindCallback	| bindNodeCallback(node 函数)
 
   	```
@@ -239,6 +257,8 @@
   * findIndex 只发出第一个满足条件的值所在的索引
     
   * first 发出第一个值 | 第一个满足条件的值
+    
+  * single 完成后 发出满足条件的第一个值 如果多个会error，没有满足的就是undefine
     
   * elementAt 只发出源的第i个值，并结束。 
     
@@ -494,26 +514,8 @@
     	.delay(5000)
     	.timeout(200, Promise.resolve(42));   
 
-  * publish 转换为ConnectableObservable 可控制信号量
-
-    ```
-    Obs.publish()===> ConnectableObservable
-    ConnectableObservable 只有调用connect 之后才会发送
-    ```
-    * publishLast
-
-    ```
-    在源 Completed后 发送给订阅者最后一个信号量
-    ```
-
-  * replay
-
-    ```
-    确保所有观察者看到相同的信号
     
-    replay操作 之后的所有信号会被保存(缓存) 所有订阅者都可以订阅到信号 。即使信号是在被订阅之前发出
-    ```
-
+    
   * refCount
 
     ```
@@ -533,35 +535,124 @@
     		
     ```
 
-  * 信号共享 【针对多次被订阅的情况】
+  * 多播
 
-    ```
-    share == publish + refCount
-    ```
+    * 说明
 
-    ```
-    let sub = Observable.create((obs)=>{
-            obs.next(1)
-            obs.next(2)
-            obs.next(3)
-            //会被调用两次
-            obs.complete()
-        })
+      ```
+      单播：不管这个 Observable被几个 Observer订阅，我一次只会给一个 Observer推送
+      多播：当源头有值发出时，这个值会同一时间发给所有的 Observer。
+      Observable都是单播
+      Subject都是多播
+      单播
+      	import { range } from 'rxjs';
+      	const source$ = range(5);
+      	source$.subscribe(value => console.log('A: ' + value));
+      	source$.subscribe(value => console.log('B: ' + value));
+      	// 先输出A: 0,A：1..A完成后,再输出B: 0...
+      多播
+      	const source$ = range(5);
+      	const subject = new Subject();
+      	subject.subscribe(value => console.log('A: ' + value));
+      	subject.subscribe(value => console.log('B: ' + value));
+      	source$.subscribe(subject)// 使用Subject多播
+      	A:0,B:0,A:1,B:1 ,A,B交替输出
+      ```
+
+      
+
+    * multicast 将Observer转为ConnectableObservable 多播
+
+      ```
+      类似上面使用Subject转多播
+      const source = interval(2000).pipe(take(5));
+      const example = source.pipe(
+        tap(_ => console.log('Side Effect #2')),
+        mapTo('Result Two!')
+      );
+      const multi  = example.pipe(multicast(() => new Subject()));
+      const subscriberOne = multi.subscribe(val => console.log(val));
+      const subscriberTwo = multi.subscribe(val => console.log(val));
+      const subscriptionConnect =multi.connect();
+      //
+      subscriberOne.unsubscribe()
+      subscriberTwo.unsubscribe()
+      subscriptionConnect.unsubscribe() 要调用
+      ```
+
+      
+
+    * refCount
+
+      ```
+      使用 multicast  需要connect 清除还需要 subscriptionConnect.unsubscribe()
+      refCount 会自动connect 当所有订阅都unsubscribe 自动调用 subscriptionConnect.unsubscribe()
+      
+      const source = interval(500);
+      const refCounted = source.pipe(
+        multicast(new Subject()),
+        refCount()
+      );
+      ```
+
+      
+
+    * publish 转换为ConnectableObservable 可控制信号量
+
+      ```
+      Obs.publish()===> ConnectableObservable
+      ConnectableObservable 只有调用connect 之后才会发送
+      
+      source.pipe(multicast(new Subject()), refCount());
+      等价于
+      source.pipe(publish(), refCount());
+      ```
+
+      * publish      multicast(new Subject()) === publish()
+
+      * publishBehavior    publishBehavior(0)`=> `new BehaviorSubject(0)
+
+      * publishReplay    publishReplay(2)`=> `new ReplaySubject(2)
+
+      * publishLast  publishLast()`=> `new AsyncSubject()
+
+        ```
+        会缓存最后一个值，在源 Completed后 发送最后一个
+        ```
+
         
-        sub.subscribe()
-        sub.subscribe()
-    ```
-    ```
-    b = Observable.create((obs)=>{
-            //这里只会 调用一次
-            obs.next(1)
-            obs.next(2)
-            obs.next(3)
-            obs.complete()
-        }).publish().refCount()
-        b.subscribe()
-        b.subscribe()
-    ```
+
+    * share 信号共享 【针对多次被订阅的情况】
+
+    * shareReplay  === share + 缓存指定格式 新的订阅后发出
+
+      ```
+      share == multicast + refCount 的简化版本
+      
+      
+      let sub  = interval(2000).pipe(take(5));
+      const example = source.pipe(
+       // 多个订阅，每个信号都会调用2次，共10次
+        tap(_ => console.log('Side Effect #2')),
+        mapTo('Result Two!')
+      );
+      example.subscribe()
+      example.subscribe()
+      
+      ///////////////////
+      
+      let sub  = interval(2000).pipe(take(5));
+      const example = source.pipe(
+       // 多个订阅共享源，每个信号都会调用1次，共5次
+        tap(_ => console.log('Side Effect #shape')),
+        mapTo('Result Two!'),
+        share()
+      );
+      example.subscribe()
+      example.subscribe()
+      ```
+
+      
 
   * buffer (缓存信号 直到边界信号出现) 
 
@@ -729,22 +820,18 @@
     const subscribe = combined.subscribe(val => console.log(val));
     ```
 
-    
-
-    
-
   * merge
 
     ```
-    组合多个信号源 然后在一次发出
+  组合多个信号源 然后在一次发出
     1    2  3
-       a      b
+     a      b
       merge
     1 a 2 3 b
     ```
-
+  
   * mergeAll(2并发数)见上
-
+  
   * mergeMapTo  将每个信号都转为xx 
 
   * mergeScan merge上增加累计器
