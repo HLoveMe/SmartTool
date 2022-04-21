@@ -159,6 +159,45 @@
     ```
      
 
+  * fromEventPattern 
+
+    ```
+    const someAPIObservable = fromEventPattern(
+      function(回调函数) { 
+      	return const A = someAPI.registerEventHandler(回调函数); 
+      }, 
+      function(回调函数, A) {
+      	someAPI.unregisterEventHandler(A); 
+      }
+    );
+    
+    fromEventPattern(
+      handler=>document.addEventListener('click', handler);,
+      hander=>document.removeEventListener('click', handler);
+    );
+    clicks.subscribe(x => console.log(x));
+    ```
+
+    
+
+  * generate 迭代
+
+    ```
+    range(5) => 0,1,2,3,4
+    ===
+    generate(
+    0,
+    (value)=>{
+    	return value>=5，
+    },
+    v=>v+1, // 叠加
+    null,// 启用
+    调度
+    )
+    ```
+
+    
+
   * empty //Rx.Observable.empty().startWith(7);
 
   * Never 不发送任何信息
@@ -172,7 +211,7 @@
     ```
     为‘信号源’设置‘启动源’
     参数:启动源
-    只有当‘启动源’next之后，才能发送‘信号源’的下一个消息
+    只有当‘启动源’next之后，才能发送‘信号源’的缓存的最新一个消息
     ```
     
     
@@ -199,16 +238,18 @@
 
     ```
     将高阶 Observable 转化为一阶 Observable 
-    通过顺序的连接内部Observable, 只有当一个完成后才能进行下一个
+    会将多个消息源缓存所有消息。
+    通过顺序的连接内部Observable, 只有当一个完成后才能进行发送下一个源的消息
     
     const example = fromEvent(document.body, 'click')
     .pipe(
       map(e => {
         return interval(1000).pipe(take(3))
       }，
-      concatAll(),// 比如快速点击三次，会按顺序输出三次 0,1,2
+      concatAll(),// 比如快速点击三次，会按顺序输出三次 0,1,2。
       switchAll 快速点击，只输出一次0,1,2，也就是说老的舍去只保留最新的
       mergeAll(2可并发数) 快速点击，会重复的输出多次0，1等。点击越多下，最后送出的频率就会越快。不会舍去，每次都会输出
+      exhausAll(),等待第一个源完成，才能开始下一个消息源。在第一个源完成前，会丢弃下一个源的消息
     ),
     concatAll:如果消息源不能保证同步顺序,内部会缓存数据,数据流完成后，它会订阅下一个缓存的数据
     //of(A,B,C).pipe(concatAll())
@@ -216,7 +257,7 @@
     ```
 
   * concatMap === map+concatAll
-
+  
     ```
     等待上一个信号完成后在进行拼接下一个信号源
     容许后面的Observer 可以接受到之前的信号源
@@ -243,7 +284,7 @@
     
 
     
-
+  
   * do | tap | let
     
     不会改变Obser的任何东西 只是增加一步回调
@@ -264,16 +305,16 @@
     
    * toPromise   被 Observable.toPromise 替代
         只能接受完成信息Promise
-
+  
    * delay
         消息队列整体延迟多少毫秒
-
+  
    * delayWhen 延迟消息，延迟到什么时候由参数决定
      
    * scan 类似数组 并发送中间值
        应用一个函数 在每次的信号上   （累加操作）
        [1,2,3,4].scan((x,y)=>x+y,initv) ===>1 3 6 10
-
+  
    * reduce 累加 并在结束后发送累加的值
      
    * ignoreElements 仅仅发送complate error
@@ -294,7 +335,7 @@
     * takeLastBufferWithTime(5000);
 
     * distinct 他会根据返回值和 [之前所有的返回值] 来判断不同，不同的才容许发送
-
+  
         ```
         此操作符会使用 Set 的最小化实现，此实现在底层依赖于 Array 和 indexOf
         Observable.of(1, 1, 2, 2, 2, 1, 2, 3, 4, 3, 2, 1)
@@ -312,11 +353,11 @@
         ```
 
         
-
+  
    * distincUntilChanged 和distinct 类似。但是只需要和前一个信号比较不同就可以。
      
    * distinctUntilKeyChanged
-
+  
       ```
       Observable.of<Person>(
           { age: 4, name: 'Foo'},
@@ -329,7 +370,7 @@
       ```
 
       
-
+  
    * groupBy 按照某个归着分组，派发信号为GroupedObservable 每一组为GroupedObservable
      
       ```
@@ -363,11 +404,13 @@
       
       
       
+   * partition 通过筛选器将源 分为两个信号源
+      
    * filter
       过滤信号 true 的可以向下执行
-
+  
       * first | last  仅仅发送第一个 |最后一个信号(完成前的第一个)
-
+  
    * max | min
      
         ```
@@ -378,7 +421,7 @@
         
         
    * pluck 解构 |  Map 改变每个信号
-
+  
        ```
        from([{value:0},{value:1}])
        .map(x=>x.value)
@@ -386,13 +429,13 @@
        .pluck("value") 
        .pluck("value",'xxx') == v.value.xxx 
        ```
-
+  
   * mapTo mapTo('Hi')====>map(x=>'Hi')
 
     
     
   * flatMap === mergeMap 适用于inner Observable  高阶
-
+  
     ```
     适用多层级Oberver  打平 信号
     
@@ -444,16 +487,16 @@
    * skipLast
 
    * endWith 在信号量 最后方加入一个信号
-
+  
    * startWith 在信号量 最前方加入一个信号
-
+  
         ```
         Observabale.from([1,2,3,4,5]).startWith(0)
         0,1,2,3,4,5, 
         ```
-
+  
    * debounce 只有当duration Observer 发出信号(或完成)后，才会发送source 缓存的最后的一个值
-
+  
         ```
         var clicks = Rx.Observable.fromEvent(document, 'click');
         var result = clicks.debounce(() => Rx.Observable.interval(1000));
@@ -461,9 +504,9 @@
         ```
 
         
-
+  
    * debounceTime
-
+  
         ```
          控制事件触发频率 (以消息为准)
         
@@ -476,9 +519,9 @@
         ```
 
   * defaultifEmpty 源 Observable 在完成之前没有发出任何 next 值，则发出给定的值
-
+  
   * throttleTime
-
+  
     ```
         控制事件触发频率
     
@@ -488,7 +531,7 @@
         时间间隔内 只容许发送一个消息
                 1  A  5  最后一个(要看是不是在时间范围类 判断是否发送)
     ```
-
+  
    * mergeMaptimeInterval 记录信号量时间间隔
 
         ```
@@ -496,15 +539,15 @@
         ```
 
         
-
+  
     * timestamp Obs<T>==>Obs<timestamp<T>>     
 
         ```
         记录信号的时间错
         ```
-
+  
         
-
+  
   * timeout 接受时间段内的信号 时间段后 会结束信号
     	
     	
@@ -517,7 +560,7 @@
     
     
   * refCount
-
+  
     ```
     ConnectableObservable ===> Observable
     
@@ -536,9 +579,9 @@
     ```
 
   * 多播
-
+  
     * 说明
-
+  
       ```
       单播：不管这个 Observable被几个 Observer订阅，我一次只会给一个 Observer推送
       多播：当源头有值发出时，这个值会同一时间发给所有的 Observer。
@@ -560,9 +603,9 @@
       ```
 
       
-
+  
     * multicast 将Observer转为ConnectableObservable 多播
-
+  
       ```
       类似上面使用Subject转多播
       const source = interval(2000).pipe(take(5));
@@ -581,9 +624,9 @@
       ```
 
       
-
+  
     * refCount
-
+  
       ```
       使用 multicast  需要connect 清除还需要 subscriptionConnect.unsubscribe()
       refCount 会自动connect 当所有订阅都unsubscribe 自动调用 subscriptionConnect.unsubscribe()
@@ -596,9 +639,9 @@
       ```
 
       
-
+  
     * publish 转换为ConnectableObservable 可控制信号量
-
+  
       ```
       Obs.publish()===> ConnectableObservable
       ConnectableObservable 只有调用connect 之后才会发送
@@ -616,16 +659,12 @@
 
       * publishLast  publishLast()`=> `new AsyncSubject()
 
-        ```
-        会缓存最后一个值，在源 Completed后 发送最后一个
-        ```
-
         
 
     * share 信号共享 【针对多次被订阅的情况】
-
+  
     * shareReplay  === share + 缓存指定格式 新的订阅后发出
-
+  
       ```
       share == multicast + refCount 的简化版本
       
@@ -653,9 +692,9 @@
       ```
 
       
-
+  
   * buffer (缓存信号 直到边界信号出现) 
-
+  
     ```
     	let source =Observel.interval(1000) //信号源
     	var clicks = Rx.Observable.fromEvent(document, 'click');//边界信号
@@ -665,9 +704,9 @@
     	-1--2-3-|---4-5|-6-7-8-9-10-|-
     	[1,2,3] [4,5] [6,,7,8,9,10]
     ```
-
+  
   * bufferWhen ~=buffer
-
+  
     ```
     var clicks = Rx.Observable.fromEvent(document, 'click');
     var buffered = clicks.bufferWhen(() =>
@@ -681,9 +720,9 @@
     ```
 
     
-
+  
   * bufferCount(bufferSize,startBufferEvery?) 基于buffer
-
+  
     ```
     bufferCount(2) 有两个信号后将其组合发送
     startBufferEvery：number 分配一组之后 向后偏移多少
@@ -693,17 +732,17 @@
     bufferCount(2,1) ==>[1,2] [2,3],[3,4],[4,5] [5,6][ 6,7]
     bufferCount(2,3) ==>[1,2],[4,5] [7]
     ```
-
+  
   * bufferTime(bufferTimeSpan: number, bufferCreationInterval: number, maxBufferSize: number) 缓存一定时间内的信号 然后组合发出
-
+  
     ```
     bufferTime(1000)//组合一秒内的信号
     bufferTime(1000,2000)//组合一秒内的信号  下一次组合 和上一次组合间隔2000ms
     bufferTime(1000,2000,10) 。。。最多组合10个信号
     ```
-
+  
   * bufferToggle 缓存 两个信号之间的原始信号
-
+  
     ```
     bufferToggle(SubscribableOrPromise,(value)=>SubscribableOrPromise)
     var source = Observable.interval(1000);
@@ -716,9 +755,9 @@
     ```
 
     
-
+  
   * 管道 pipe
-
+  
     ```
     一个管道  可以定义你自己的信号处理过程 （自定义操作符）
     pipeable 好处是 自定义的操作符 不需要再每个Observable原型上绑定 
@@ -753,9 +792,11 @@
 
 * 组合信号
 
-  * concat 
+  * concat  静态方法或者操作符 订阅源完成，再订阅下一个
 
-  * pairwise 默认将信号 两两组合
+  * concatAll 见上
+
+  * pairwise 默认将信号数据 两两组合 
 
   * toArray() 在信号完成之前将所有信号组合为一个数组
 
@@ -764,11 +805,11 @@
   * zip
 
     ```
-    Observable.zip
+    import { zip  } from 'rxjs'
     多个消息源  
     把 对应索引 下的多个消息源 组合之后在发出 
     必须对应所有索引都有消息 在发出
-    Ob.zip(sourceA,sourceB,(A,B)=>T).sub(T)
+    zip(sourceA,sourceB,(A,B)=>T).sub(T)
     ```
 
     
@@ -829,9 +870,9 @@
       merge
     1 a 2 3 b
     ```
-  
+
   * mergeAll(2并发数)见上
-  
+
   * mergeMapTo  将每个信号都转为xx 
 
   * mergeScan merge上增加累计器
