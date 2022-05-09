@@ -355,8 +355,12 @@
         
   
    * distincUntilChanged 和distinct 类似。但是只需要和前一个信号比较不同就可以。
+      
+      ```
+       === false 为不相同 可以派发
+      ```
      
-   * distinctUntilKeyChanged  === false 为不相同 可以派发
+   * distinctUntilKeyChanged 
   
       ```
       Observable.of<Person>(
